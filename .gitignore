@@ -1,0 +1,22 @@
+# Installable packages
+
+node_modules/
+
+# Configuration
+
+.config/
+
+# Building artifacts
+
+bld/
+dist/
+.cache/
+*.tgz
+
+# Debugging outputs
+
+*.log
+
+# Testing files
+
+/test.*

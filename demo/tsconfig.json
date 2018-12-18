@@ -1,0 +1,15 @@
+{
+  "extends": "@magicspace/configs/tsconfig.json",
+  "compilerOptions": {
+    "module": "esnext",
+    "moduleResolution": "node",
+    "lib": ["esnext", "dom", "dom.iterable"],
+    "types": ["../src/library/types/draft-js-plugins-editor"],
+    "jsx": "react",
+    "experimentalDecorators": true,
+    "declaration": true,
+
+    "rootDir": ".",
+    "noEmit": true
+  }
+}
