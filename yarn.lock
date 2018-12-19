@@ -29,6 +29,11 @@
     "@types/react" "*"
     immutable "^3.8.1"
 
+"@types/linkify-it@^2.0.4":
+  version "2.0.4"
+  resolved "http://registry.npm.taobao.org/@types/linkify-it/download/@types/linkify-it-2.0.4.tgz#80a7f9aec4c9283e8333debda5a88511d4a529a7"
+  integrity sha1-gKf5rsTJKD6DM969paiFEdSlKac=
+
 "@types/prop-types@*":
   version "15.5.8"
   resolved "http://registry.npm.taobao.org/@types/prop-types/download/@types/prop-types-15.5.8.tgz#8ae4e0ea205fe95c3901a5a1df7f66495e3a56ce"
@@ -48,6 +53,11 @@
   dependencies:
     "@types/prop-types" "*"
     csstype "^2.2.0"
+
+"@types/tlds@^1.199.0":
+  version "1.199.0"
+  resolved "http://registry.npm.taobao.org/@types/tlds/download/@types/tlds-1.199.0.tgz#4647fd75cb388f4039bfa4a9ae66d4de989cbc87"
+  integrity sha1-Rkf9dcs4j0A5v6SprmbU3picvIc=
 
 ansi-regex@^2.0.0:
   version "2.1.1"
@@ -324,6 +334,13 @@ js-yaml@^3.7.0:
     argparse "^1.0.7"
     esprima "^4.0.0"
 
+linkify-it@^2.1.0:
+  version "2.1.0"
+  resolved "http://registry.npm.taobao.org/linkify-it/download/linkify-it-2.1.0.tgz#c4caf38a6cd7ac2212ef3c7d2bde30a91561f9db"
+  integrity sha1-xMrzimzXrCIS7zx9K94wqRVh+ds=
+  dependencies:
+    uc.micro "^1.0.1"
+
 lodash@^4.17.10, lodash@^4.17.11:
   version "4.17.11"
   resolved "http://registry.npm.taobao.org/lodash/download/lodash-4.17.11.tgz#b39ea6229ef607ecd89e2c8df12536891cac9b8d"
@@ -486,6 +503,11 @@ supports-color@^5.3.0:
   dependencies:
     has-flag "^3.0.0"
 
+tlds@^1.203.1:
+  version "1.203.1"
+  resolved "http://registry.npm.taobao.org/tlds/download/tlds-1.203.1.tgz#4dc9b02f53de3315bc98b80665e13de3edfc1dfc"
+  integrity sha1-TcmwL1PeMxW8mLgGZeE94+38Hfw=
+
 tslang@^0.1.9:
   version "0.1.11"
   resolved "http://registry.npm.taobao.org/tslang/download/tslang-0.1.11.tgz#8ec5599ce2662aa25fdaadbbf88b9b2655f56a19"
@@ -542,6 +564,11 @@ ua-parser-js@^0.7.18:
   version "0.7.19"
   resolved "http://registry.npm.taobao.org/ua-parser-js/download/ua-parser-js-0.7.19.tgz#94151be4c0a7fb1d001af7022fdaca4642659e4b"
   integrity sha1-lBUb5MCn+x0AGvcCL9rKRkJlnks=
+
+uc.micro@^1.0.1:
+  version "1.0.5"
+  resolved "http://registry.npm.taobao.org/uc.micro/download/uc.micro-1.0.5.tgz#0c65f15f815aa08b560a61ce8b4db7ffc3f45376"
+  integrity sha1-DGXxX4FaoItWCmHOi023/8P0U3Y=
 
 union-class-names@^1.0.0:
   version "1.0.0"

@@ -1,19 +1,37 @@
-import {DraftHandleValue, EditorState} from 'draft-js';
+import {DraftDecorator, DraftHandleValue, EditorState} from 'draft-js';
 import {EditorPluginFunctions} from 'draft-js-plugins-editor';
 
+import {LinkDecoratorOptions, createLinkDecorator} from './@decorators';
 import {Feature, FeatureOptions, FeatureTrigger} from './@feature';
-import {BLOCK_FEATURES, INLINE_FEATURES} from './@features';
+import {
+  createBoldFeature,
+  createCodeFeature,
+  createItalicFeature,
+  createStrikethroughFeature,
+} from './@features';
 import {handleInlineStyleOverriding, splitBlock} from './@utils';
 
+export interface FluentMarkdownPluginLinkOptions extends LinkDecoratorOptions {}
+
 export interface FluentMarkdownPluginOptions {
+  link?: FluentMarkdownPluginLinkOptions;
   block?: boolean;
 }
 
 export class FluentMarkdownPlugin {
+  readonly decorators: DraftDecorator[];
+
   private features: Feature[];
 
-  constructor({block = true}: FluentMarkdownPluginOptions) {
-    this.features = [...INLINE_FEATURES, ...(block ? BLOCK_FEATURES : [])];
+  constructor({link: linkOptions = {}}: FluentMarkdownPluginOptions) {
+    this.decorators = [createLinkDecorator(linkOptions)];
+
+    this.features = [
+      createBoldFeature(),
+      createItalicFeature(),
+      createStrikethroughFeature(),
+      createCodeFeature(),
+    ];
   }
 
   handleBeforeInput = (

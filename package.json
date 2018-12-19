@@ -13,13 +13,17 @@
     "react": "16"
   },
   "dependencies": {
-    "immutable": "~3.7.4"
+    "immutable": "~3.7.4",
+    "linkify-it": "^2.1.0",
+    "tlds": "^1.203.1"
   },
   "devDependencies": {
     "@magicspace/configs": "^0.1.46",
     "@types/draft-js": "^0.10.26",
+    "@types/linkify-it": "^2.0.4",
     "@types/react": "^16.7.17",
     "@types/react-dom": "^16.0.11",
+    "@types/tlds": "^1.199.0",
     "draft-js": "^0.10.5",
     "draft-js-plugins-editor": "^2.1.1",
     "prettier": "^1.15.3",

@@ -6,6 +6,7 @@
     "lib": ["esnext", "dom", "dom.iterable"],
     "experimentalDecorators": true,
     "declaration": true,
+    "jsx": "react",
 
     "rootDir": ".",
     "outDir": "../../bld/library"

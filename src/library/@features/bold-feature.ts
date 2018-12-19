@@ -1,6 +1,7 @@
 import {DraftInlineStyle} from 'draft-js';
 import {OrderedSet} from 'immutable';
 
+import {Feature} from '../@feature';
 import {unescapeMarkdown} from '../@utils';
 
 import {createInlineFeature} from './@inline-feature';
@@ -10,27 +11,29 @@ const UNDERLINE_BOLD_REGEX = /(?:^|[^_])(_{2})((?:\\.|(?!\\|_{2}).)+)(_{2})$/;
 
 const BOLD_STYLE: DraftInlineStyle = OrderedSet(['BOLD']);
 
-export const boldFeature = createInlineFeature({
-  style: BOLD_STYLE,
-  matcher(textBeforeOffset) {
-    let groups =
-      ASTERISK_BOLD_REGEX.exec(textBeforeOffset) ||
-      UNDERLINE_BOLD_REGEX.exec(textBeforeOffset);
+export function createBoldFeature(): Feature {
+  return createInlineFeature({
+    style: BOLD_STYLE,
+    matcher(textBeforeOffset) {
+      let groups =
+        ASTERISK_BOLD_REGEX.exec(textBeforeOffset) ||
+        UNDERLINE_BOLD_REGEX.exec(textBeforeOffset);
 
-    if (!groups) {
-      return undefined;
-    }
+      if (!groups) {
+        return undefined;
+      }
 
-    let [, opening, markdownSource, closing] = groups;
+      let [, opening, markdownSource, closing] = groups;
 
-    let {markdown, text} = unescapeMarkdown(markdownSource);
+      let {markdown, text} = unescapeMarkdown(markdownSource);
 
-    return {
-      markdown: [opening, ...markdown, closing],
-      text: ['', ...text, ''],
-    };
-  },
-  characterCompatibilityTester(metadata) {
-    return !metadata.hasStyle('CODE');
-  },
-});
+      return {
+        markdown: [opening, ...markdown, closing],
+        text: ['', ...text, ''],
+      };
+    },
+    characterCompatibilityTester(metadata) {
+      return !metadata.hasStyle('CODE');
+    },
+  });
+}
