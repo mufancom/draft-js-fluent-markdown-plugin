@@ -21,10 +21,13 @@ export interface InlineFeatureOptions {
     blockTextBeforeOffset: string,
     blockTextAfterOffset: string,
   ): InlineFeatureMatchResult | undefined;
-  characterCompatibilityTester(metadata: CharacterMetadata): boolean;
+  characterCompatibilityTester(
+    metadata: CharacterMetadata,
+    precedingMetadata: CharacterMetadata | undefined,
+  ): boolean;
 }
 
-export function createInlineFeature({
+export function createAutoConversionFeature({
   style,
   matcher,
   characterCompatibilityTester,
@@ -76,8 +79,12 @@ export function createInlineFeature({
 
     if (
       draftCharacterMetadataItems.some(
-        metadata =>
-          !!metadata.getEntity() || !characterCompatibilityTester(metadata),
+        (metadata, index) =>
+          !!metadata.getEntity() ||
+          !characterCompatibilityTester(
+            metadata,
+            draftCharacterMetadataItems[index + 1],
+          ),
       )
     ) {
       return editorState;

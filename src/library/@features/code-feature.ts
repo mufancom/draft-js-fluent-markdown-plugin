@@ -4,14 +4,14 @@ import {OrderedSet} from 'immutable';
 import {Feature} from '../@feature';
 import {unescapeMarkdown} from '../@utils';
 
-import {createInlineFeature} from './@inline-feature';
+import {createAutoConversionFeature} from './@auto-conversion-feature';
 
 const CODE_REGEX = /(?:^|[^`])(`)((?:\\.|(?![`\\]).)+)(`)$/;
 
 const CODE_STYLE: DraftInlineStyle = OrderedSet(['CODE']);
 
 export function createCodeFeature(): Feature {
-  return createInlineFeature({
+  return createAutoConversionFeature({
     style: CODE_STYLE,
     matcher(textBeforeOffset) {
       let groups = CODE_REGEX.exec(textBeforeOffset);

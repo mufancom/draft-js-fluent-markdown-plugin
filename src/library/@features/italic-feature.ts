@@ -4,7 +4,7 @@ import {OrderedSet} from 'immutable';
 import {Feature} from '../@feature';
 import {unescapeMarkdown} from '../@utils';
 
-import {createInlineFeature} from './@inline-feature';
+import {createAutoConversionFeature} from './@auto-conversion-feature';
 
 const ASTERISK_ITALIC_REGEX = /(?:^|[^*])(\*)((?:\\.|(?!\\|\*).)+)(\*)$/;
 const UNDERLINE_ITALIC_REGEX = /(?:^|[^_])(_)((?:\\.|(?!\\|_).)+)(_)$/;
@@ -12,7 +12,7 @@ const UNDERLINE_ITALIC_REGEX = /(?:^|[^_])(_)((?:\\.|(?!\\|_).)+)(_)$/;
 const ITALIC_STYLE: DraftInlineStyle = OrderedSet(['ITALIC']);
 
 export function createItalicFeature(): Feature {
-  return createInlineFeature({
+  return createAutoConversionFeature({
     style: ITALIC_STYLE,
     matcher(textBeforeOffset) {
       let groups =
