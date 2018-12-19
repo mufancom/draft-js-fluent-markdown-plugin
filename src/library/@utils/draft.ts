@@ -1,4 +1,9 @@
-import {DraftInlineStyle, EditorState, Modifier} from 'draft-js';
+import {
+  CharacterMetadata,
+  DraftInlineStyle,
+  EditorState,
+  Modifier,
+} from 'draft-js';
 import {OrderedSet} from 'immutable';
 
 const EMPTY_STYLE: DraftInlineStyle = OrderedSet();
@@ -45,4 +50,35 @@ export function handleInlineStyleOverriding(
   }
 
   return editorState;
+}
+
+export function isCharacterMetadataEntityAlike(
+  metadata: CharacterMetadata,
+): boolean {
+  return !!metadata.getEntity() || metadata.hasStyle('CODE');
+}
+
+export function characterListContainsEntityAlike(
+  list: CharacterMetadata[],
+): boolean {
+  return list.some(metadata => isCharacterMetadataEntityAlike(metadata));
+}
+
+export function testCharacterListConsistency([
+  first,
+  ...rest
+]: CharacterMetadata[]): boolean {
+  let entityKey = first.getEntity();
+  let style = first.getStyle();
+
+  for (let metadata of rest) {
+    if (
+      metadata.getEntity() !== entityKey ||
+      !metadata.getStyle().equals(style)
+    ) {
+      return false;
+    }
+  }
+
+  return true;
 }

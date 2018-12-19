@@ -2,7 +2,11 @@ import {DraftInlineStyle} from 'draft-js';
 import {OrderedSet} from 'immutable';
 
 import {Feature} from '../@feature';
-import {unescapeMarkdown} from '../@utils';
+import {
+  characterListContainsEntityAlike,
+  testCharacterListConsistency,
+  unescapeMarkdown,
+} from '../@utils';
 
 import {createAutoConversionFeature} from './@auto-conversion-feature';
 
@@ -25,12 +29,19 @@ export function createCodeFeature(): Feature {
       let {markdownFragments, textFragments} = unescapeMarkdown(markdownSource);
 
       return {
-        markdownFragments: [opening, ...markdownFragments, closing],
-        textFragments: ['', ...textFragments, ''],
+        opening,
+        closing,
+        markdownFragments,
+        textFragments,
       };
     },
-    characterCompatibilityTester(metadata) {
-      return metadata.getStyle().size === 0;
+    compatibilityTester(opening, content, closing) {
+      let list = [...opening, ...content, ...closing];
+
+      return (
+        !characterListContainsEntityAlike(list) &&
+        testCharacterListConsistency(list)
+      );
     },
   });
 }

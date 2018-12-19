@@ -2,7 +2,11 @@ import {DraftInlineStyle} from 'draft-js';
 import {OrderedSet} from 'immutable';
 
 import {Feature} from '../@feature';
-import {unescapeMarkdown} from '../@utils';
+import {
+  characterListContainsEntityAlike,
+  testCharacterListConsistency,
+  unescapeMarkdown,
+} from '../@utils';
 
 import {createAutoConversionFeature} from './@auto-conversion-feature';
 
@@ -29,8 +33,10 @@ export function createLinkFeature(): Feature {
       let {text: href} = unescapeMarkdown(urlMarkdownSource);
 
       return {
-        markdownFragments: [opening, ...markdownFragments, closing],
-        textFragments: ['', ...textFragments, ''],
+        opening,
+        closing,
+        markdownFragments,
+        textFragments,
         entity: {
           type: 'LINK',
           mutability: 'MUTABLE',
@@ -38,10 +44,12 @@ export function createLinkFeature(): Feature {
         },
       };
     },
-    characterCompatibilityTester(metadata, nextMetadata) {
+    compatibilityTester(opening, content, closing) {
+      let list = [...opening, ...content, ...closing];
+
       return (
-        !metadata.hasStyle('CODE') &&
-        (!nextMetadata || metadata.getStyle().equals(nextMetadata.getStyle()))
+        !characterListContainsEntityAlike(list) &&
+        testCharacterListConsistency(list)
       );
     },
   });

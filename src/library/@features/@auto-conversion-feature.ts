@@ -18,6 +18,8 @@ export interface AutoConversionFeatureMatchEntityDescriptor {
 }
 
 export interface AutoConversionFeatureMatchResult {
+  opening: string;
+  closing: string;
   markdownFragments: string[];
   textFragments: string[];
   entity?: AutoConversionFeatureMatchEntityDescriptor;
@@ -29,16 +31,17 @@ export interface AutoConversionFeatureOptions {
     blockTextBeforeOffset: string,
     blockTextAfterOffset: string,
   ): AutoConversionFeatureMatchResult | undefined;
-  characterCompatibilityTester(
-    metadata: CharacterMetadata,
-    nextMetadata: CharacterMetadata | undefined,
+  compatibilityTester(
+    opening: CharacterMetadata[],
+    content: CharacterMetadata[],
+    closing: CharacterMetadata[],
   ): boolean;
 }
 
 export function createAutoConversionFeature({
   style,
   matcher,
-  characterCompatibilityTester,
+  compatibilityTester,
 }: AutoConversionFeatureOptions): Feature {
   return function processInlineFeature(
     editorState: EditorState,
@@ -57,7 +60,13 @@ export function createAutoConversionFeature({
       return editorState;
     }
 
-    let {markdownFragments, textFragments, entity: entityDescriptor} = result;
+    let {
+      opening,
+      closing,
+      markdownFragments,
+      textFragments,
+      entity: entityDescriptor,
+    } = result;
 
     if (!Array.isArray(markdownFragments)) {
       throw new Error(
@@ -77,24 +86,40 @@ export function createAutoConversionFeature({
       );
     }
 
+    if (opening) {
+      markdownFragments.unshift(opening);
+      textFragments.unshift('');
+    }
+
+    if (closing) {
+      markdownFragments.push(closing);
+      textFragments.push('');
+    }
+
     let markdown = markdownFragments.join('');
     let text = textFragments.join('');
 
     let offsetBeforeMarkdown = offset - markdown.length;
+    let offsetAfterOpening = offsetBeforeMarkdown + opening.length;
+    let offsetBeforeClosing = offset - closing.length;
 
-    let draftCharacterMetadataItems = block
-      .getCharacterList()
-      .toArray()
-      .slice(offsetBeforeMarkdown, offset);
+    let characterList = block.getCharacterList().toArray();
+
+    let openingCharacterList = characterList.slice(
+      offsetBeforeMarkdown,
+      offsetAfterOpening,
+    );
+    let contentCharacterList = characterList.slice(
+      offsetAfterOpening,
+      offsetBeforeClosing,
+    );
+    let closingCharacterList = characterList.slice(offsetBeforeClosing, offset);
 
     if (
-      draftCharacterMetadataItems.some(
-        (metadata, index) =>
-          !!metadata.getEntity() ||
-          !characterCompatibilityTester(
-            metadata,
-            draftCharacterMetadataItems[index + 1],
-          ),
+      !compatibilityTester(
+        openingCharacterList,
+        contentCharacterList,
+        closingCharacterList,
       )
     ) {
       return editorState;
