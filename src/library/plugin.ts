@@ -7,6 +7,7 @@ import {
   createBoldFeature,
   createCodeFeature,
   createItalicFeature,
+  createLinkFeature,
   createStrikethroughFeature,
 } from './@features';
 import {handleInlineStyleOverriding, splitBlock} from './@utils';
@@ -31,6 +32,7 @@ export class FluentMarkdownPlugin {
       createItalicFeature(),
       createStrikethroughFeature(),
       createCodeFeature(),
+      createLinkFeature(),
     ];
   }
 

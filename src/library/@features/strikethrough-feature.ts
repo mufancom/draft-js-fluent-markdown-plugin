@@ -22,11 +22,11 @@ export function createStrikethroughFeature(): Feature {
 
       let [, opening, markdownSource, closing] = groups;
 
-      let {markdown, text} = unescapeMarkdown(markdownSource);
+      let {markdownFragments, textFragments} = unescapeMarkdown(markdownSource);
 
       return {
-        markdown: [opening, ...markdown, closing],
-        text: ['', ...text, ''],
+        markdownFragments: [opening, ...markdownFragments, closing],
+        textFragments: ['', ...textFragments, ''],
       };
     },
     characterCompatibilityTester(metadata) {

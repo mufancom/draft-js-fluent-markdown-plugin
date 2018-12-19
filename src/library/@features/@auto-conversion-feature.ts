@@ -1,6 +1,7 @@
 import {
   CharacterMetadata,
   ContentState,
+  DraftEntityMutability,
   DraftInlineStyle,
   EditorState,
   Modifier,
@@ -10,20 +11,27 @@ import {
 import {Feature, FeatureOptions} from '../@feature';
 import {splitBlock} from '../@utils';
 
-export interface InlineFeatureMatchResult {
-  markdown: string[];
-  text: string[];
+export interface AutoConversionFeatureMatchEntityDescriptor {
+  type: string;
+  mutability: DraftEntityMutability;
+  data: object;
 }
 
-export interface InlineFeatureOptions {
+export interface AutoConversionFeatureMatchResult {
+  markdownFragments: string[];
+  textFragments: string[];
+  entity?: AutoConversionFeatureMatchEntityDescriptor;
+}
+
+export interface AutoConversionFeatureOptions {
   style: DraftInlineStyle;
   matcher(
     blockTextBeforeOffset: string,
     blockTextAfterOffset: string,
-  ): InlineFeatureMatchResult | undefined;
+  ): AutoConversionFeatureMatchResult | undefined;
   characterCompatibilityTester(
     metadata: CharacterMetadata,
-    precedingMetadata: CharacterMetadata | undefined,
+    nextMetadata: CharacterMetadata | undefined,
   ): boolean;
 }
 
@@ -31,7 +39,7 @@ export function createAutoConversionFeature({
   style,
   matcher,
   characterCompatibilityTester,
-}: InlineFeatureOptions): Feature {
+}: AutoConversionFeatureOptions): Feature {
   return function processInlineFeature(
     editorState: EditorState,
     {
@@ -49,33 +57,35 @@ export function createAutoConversionFeature({
       return editorState;
     }
 
-    let {markdown, text} = result;
+    let {markdownFragments, textFragments, entity: entityDescriptor} = result;
 
-    if (!Array.isArray(markdown)) {
+    if (!Array.isArray(markdownFragments)) {
       throw new Error(
         'Expecting `markdown` property of matcher result to be an array',
       );
     }
 
-    if (!Array.isArray(text)) {
+    if (!Array.isArray(textFragments)) {
       throw new Error(
         'Expecting `text` property of matcher result to be an array',
       );
     }
 
-    if (markdown.length !== text.length) {
+    if (markdownFragments.length !== textFragments.length) {
       throw new Error(
         'Expecting `markdown` and `text` property of matcher result to have the same length',
       );
     }
 
-    let markdownString = markdown.join('');
-    let textString = text.join('');
+    let markdown = markdownFragments.join('');
+    let text = textFragments.join('');
+
+    let offsetBeforeMarkdown = offset - markdown.length;
 
     let draftCharacterMetadataItems = block
       .getCharacterList()
       .toArray()
-      .slice(offset - markdownString.length, offset);
+      .slice(offsetBeforeMarkdown, offset);
 
     if (
       draftCharacterMetadataItems.some(
@@ -121,9 +131,11 @@ export function createAutoConversionFeature({
 
     // replace markdown with styled text
 
-    let [replacementContent] = markdown.reduce<[ContentState, number, number]>(
+    let [replacementContent] = markdownFragments.reduce<
+      [ContentState, number, number]
+    >(
       ([content, sourceOffset, offset], source, index) => {
-        let unescaped = text[index];
+        let unescaped = textFragments[index];
 
         let range = SelectionState.createEmpty(blockKey).merge({
           anchorOffset: offset,
@@ -140,8 +152,8 @@ export function createAutoConversionFeature({
       },
       [
         editorState.getCurrentContent(),
-        offset - markdownString.length,
-        offset - markdownString.length,
+        offsetBeforeMarkdown,
+        offsetBeforeMarkdown,
       ],
     );
 
@@ -151,9 +163,27 @@ export function createAutoConversionFeature({
       'change-inline-style',
     );
 
+    if (entityDescriptor) {
+      let {type, mutability, data} = entityDescriptor;
+
+      let content = editorState.getCurrentContent();
+
+      content = content.createEntity(type, mutability, data);
+
+      let entityKey = content.getLastCreatedEntityKey();
+
+      let range = SelectionState.createEmpty(blockKey).merge({
+        anchorOffset: offsetBeforeMarkdown,
+        focusOffset: offsetBeforeMarkdown + text.length,
+      }) as SelectionState;
+
+      content = Modifier.applyEntity(content, range, entityKey);
+
+      editorState = EditorState.push(editorState, content, 'apply-entity');
+    }
+
     if (!finalSelection) {
-      let selectionOffset =
-        offset + (textString.length - markdownString.length + input.length);
+      let selectionOffset = offsetBeforeMarkdown + text.length + input.length;
 
       finalSelection = initialSelection.merge({
         anchorOffset: selectionOffset,
