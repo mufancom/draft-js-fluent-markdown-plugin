@@ -157,30 +157,34 @@ export function createAutoConversionFeature({
       ],
     );
 
-    editorState = EditorState.push(
-      editorState,
-      replacementContent,
-      'change-inline-style',
-    );
-
     if (entityDescriptor) {
       let {type, mutability, data} = entityDescriptor;
 
-      let content = editorState.getCurrentContent();
+      replacementContent = replacementContent.createEntity(
+        type,
+        mutability,
+        data,
+      );
 
-      content = content.createEntity(type, mutability, data);
-
-      let entityKey = content.getLastCreatedEntityKey();
+      let entityKey = replacementContent.getLastCreatedEntityKey();
 
       let range = SelectionState.createEmpty(blockKey).merge({
         anchorOffset: offsetBeforeMarkdown,
         focusOffset: offsetBeforeMarkdown + text.length,
       }) as SelectionState;
 
-      content = Modifier.applyEntity(content, range, entityKey);
-
-      editorState = EditorState.push(editorState, content, 'apply-entity');
+      replacementContent = Modifier.applyEntity(
+        replacementContent,
+        range,
+        entityKey,
+      );
     }
+
+    editorState = EditorState.push(
+      editorState,
+      replacementContent,
+      'change-inline-style',
+    );
 
     if (!finalSelection) {
       let selectionOffset = offsetBeforeMarkdown + text.length + input.length;
