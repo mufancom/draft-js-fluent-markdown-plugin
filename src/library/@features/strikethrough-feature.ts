@@ -1,7 +1,7 @@
 import {DraftInlineStyle} from 'draft-js';
 import {OrderedSet} from 'immutable';
 
-import {unescapeMarkdown} from '../utils';
+import {unescapeMarkdown} from '../@utils';
 
 import {createInlineFeature} from './@inline-feature';
 

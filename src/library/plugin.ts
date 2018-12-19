@@ -3,7 +3,7 @@ import {EditorPluginFunctions} from 'draft-js-plugins-editor';
 
 import {Feature, FeatureOptions, FeatureTrigger} from './@feature';
 import {BLOCK_FEATURES, INLINE_FEATURES} from './@features';
-import {handleInlineStyleOverriding, splitBlock} from './utils';
+import {handleInlineStyleOverriding, splitBlock} from './@utils';
 
 export interface FluentMarkdownPluginOptions {
   block?: boolean;

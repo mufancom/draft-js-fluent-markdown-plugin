@@ -8,7 +8,7 @@ import {
 } from 'draft-js';
 
 import {Feature, FeatureOptions} from '../@feature';
-import {splitBlock} from '../utils';
+import {splitBlock} from '../@utils';
 
 export interface InlineFeatureMatchResult {
   markdown: string[];
