@@ -5,7 +5,7 @@ import Editor from 'draft-js-plugins-editor';
 import React, {Component, ReactNode} from 'react';
 import ReactDOM from 'react-dom';
 
-import {createFluentMarkdownPlugin} from '../bld/library';
+import createFluentMarkdownPlugin from '../bld/library';
 
 const PLUGINS = [createFluentMarkdownPlugin()];
 

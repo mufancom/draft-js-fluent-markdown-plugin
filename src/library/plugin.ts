@@ -1,19 +1,19 @@
 import {DraftHandleValue, EditorState} from 'draft-js';
 import {EditorPluginFunctions} from 'draft-js-plugins-editor';
 
-import {Feature, FeatureOptions, FeatureTrigger} from './feature';
-import {FULL_FEATURES} from './features';
+import {Feature, FeatureOptions, FeatureTrigger} from './@feature';
+import {BLOCK_FEATURES, INLINE_FEATURES} from './@features';
 import {handleInlineStyleOverriding, splitBlock} from './utils';
 
 export interface FluentMarkdownPluginOptions {
-  features?: Feature[];
+  block?: boolean;
 }
 
 export class FluentMarkdownPlugin {
   private features: Feature[];
 
-  constructor({features = FULL_FEATURES}: FluentMarkdownPluginOptions) {
-    this.features = features;
+  constructor({block = true}: FluentMarkdownPluginOptions) {
+    this.features = [...INLINE_FEATURES, ...(block ? BLOCK_FEATURES : [])];
   }
 
   handleBeforeInput = (

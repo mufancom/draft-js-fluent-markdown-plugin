@@ -1,12 +1,13 @@
 import {
   CharacterMetadata,
+  ContentState,
   DraftInlineStyle,
   EditorState,
   Modifier,
   SelectionState,
 } from 'draft-js';
 
-import {Feature, FeatureOptions} from '../feature';
+import {Feature, FeatureOptions} from '../@feature';
 import {splitBlock} from '../utils';
 
 export interface InlineFeatureMatchResult {
@@ -75,7 +76,8 @@ export function createInlineFeature({
 
     if (
       draftCharacterMetadataItems.some(
-        metadata => !characterCompatibilityTester(metadata),
+        metadata =>
+          !!metadata.getEntity() || !characterCompatibilityTester(metadata),
       )
     ) {
       return editorState;
@@ -112,28 +114,29 @@ export function createInlineFeature({
 
     // replace markdown with styled text
 
-    let replacementOffset = offset - markdownString.length;
-    let replacementContent = editorState.getCurrentContent();
+    let [replacementContent] = markdown.reduce<[ContentState, number, number]>(
+      ([content, sourceOffset, offset], source, index) => {
+        let unescaped = text[index];
 
-    for (let [index, source] of markdown.entries()) {
-      let unescaped = text[index];
+        let range = SelectionState.createEmpty(blockKey).merge({
+          anchorOffset: offset,
+          focusOffset: offset + source.length,
+        }) as SelectionState;
 
-      let range = SelectionState.createEmpty(blockKey).merge({
-        anchorOffset: replacementOffset,
-        focusOffset: replacementOffset + source.length,
-      }) as SelectionState;
+        let mergedStyle = block.getInlineStyleAt(sourceOffset).merge(style);
 
-      let mergedStyle = block.getInlineStyleAt(replacementOffset).merge(style);
-
-      replacementContent = Modifier.replaceText(
-        replacementContent,
-        range,
-        unescaped,
-        mergedStyle,
-      );
-
-      replacementOffset += unescaped.length;
-    }
+        return [
+          Modifier.replaceText(content, range, unescaped, mergedStyle),
+          sourceOffset + source.length,
+          offset + unescaped.length,
+        ];
+      },
+      [
+        editorState.getCurrentContent(),
+        offset - markdownString.length,
+        offset - markdownString.length,
+      ],
+    );
 
     editorState = EditorState.push(
       editorState,
