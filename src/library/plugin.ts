@@ -3,6 +3,7 @@ import {EditorPluginFunctions} from 'draft-js-plugins-editor';
 
 import {Feature, FeatureOptions, FeatureTrigger} from './feature';
 import {FULL_FEATURES} from './features';
+import {handleInlineStyleOverriding, splitBlock} from './utils';
 
 export interface FluentMarkdownPluginOptions {
   features?: Feature[];
@@ -40,6 +41,11 @@ export class FluentMarkdownPlugin {
     switch (command) {
       case 'split-block':
         nextEditorState = this.triggerFeature(editorState, {command});
+
+        if (!nextEditorState) {
+          nextEditorState = splitBlock(editorState);
+        }
+
         break;
     }
 
@@ -49,6 +55,10 @@ export class FluentMarkdownPlugin {
     } else {
       return 'not-handled';
     }
+  };
+
+  onChange = (editorState: EditorState): EditorState => {
+    return handleInlineStyleOverriding(editorState);
   };
 
   private triggerFeature(
@@ -67,10 +77,8 @@ export class FluentMarkdownPlugin {
     let blockTextAfterOffset = blockText.slice(offset);
 
     let options: FeatureOptions = {
-      offset,
       trigger,
-      content,
-      selection,
+      offset,
       block,
       blockKey,
       blockTextBeforeOffset,

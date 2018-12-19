@@ -1,9 +1,4 @@
-import {
-  ContentBlock,
-  ContentState,
-  EditorState,
-  SelectionState,
-} from 'draft-js';
+import {ContentBlock, EditorState} from 'draft-js';
 
 export interface FeatureTrigger {
   input?: string;
@@ -11,10 +6,8 @@ export interface FeatureTrigger {
 }
 
 export interface FeatureOptions {
-  offset: number;
   trigger: FeatureTrigger;
-  content: ContentState;
-  selection: SelectionState;
+  offset: number;
   block: ContentBlock;
   blockKey: string;
   blockTextBeforeOffset: string;

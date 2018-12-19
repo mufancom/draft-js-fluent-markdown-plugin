@@ -5,11 +5,9 @@ import {
   Modifier,
   SelectionState,
 } from 'draft-js';
-import {OrderedSet} from 'immutable';
 
 import {Feature, FeatureOptions} from '../feature';
-
-const NONE_STYLE: DraftInlineStyle = OrderedSet();
+import {splitBlock} from '../utils';
 
 export interface InlineFeatureMatchResult {
   markdown: string[];
@@ -34,7 +32,6 @@ export function createInlineFeature({
     editorState: EditorState,
     {
       trigger: {input = '', command},
-      selection,
       offset,
       block,
       blockKey,
@@ -84,47 +81,31 @@ export function createInlineFeature({
       return editorState;
     }
 
+    let initialSelection = editorState.getSelection();
     let finalSelection: SelectionState | undefined;
-    let toResetStyle = false;
 
     // insert character
 
     if (input) {
-      let insertionContent = editorState.getCurrentContent();
+      let content = editorState.getCurrentContent();
 
-      insertionContent = Modifier.insertText(
-        insertionContent,
-        selection,
+      content = Modifier.insertText(
+        content,
+        initialSelection,
         input,
         block.getInlineStyleAt(offset),
       );
 
-      editorState = EditorState.push(
-        editorState,
-        insertionContent,
-        'insert-characters',
-      );
+      editorState = EditorState.push(editorState, content, 'insert-characters');
 
       editorState = EditorState.acceptSelection(
         editorState,
-        insertionContent.getSelectionAfter(),
+        content.getSelectionAfter(),
       );
     } else if (command === 'split-block') {
-      let splittingContent = editorState.getCurrentContent();
+      editorState = splitBlock(editorState);
 
-      splittingContent = Modifier.splitBlock(splittingContent, selection);
-
-      finalSelection = splittingContent.getSelectionAfter();
-
-      editorState = EditorState.push(
-        editorState,
-        splittingContent,
-        'split-block',
-      );
-
-      editorState = EditorState.acceptSelection(editorState, finalSelection);
-
-      toResetStyle = true;
+      finalSelection = editorState.getCurrentContent().getSelectionAfter();
     } else {
       return editorState;
     }
@@ -154,27 +135,23 @@ export function createInlineFeature({
       replacementOffset += unescaped.length;
     }
 
-    if (!finalSelection) {
-      let selectionOffset =
-        offset + (textString.length - markdownString.length + input.length);
-
-      finalSelection = selection.merge({
-        anchorOffset: selectionOffset,
-        focusOffset: selectionOffset,
-      }) as SelectionState;
-    }
-
     editorState = EditorState.push(
       editorState,
       replacementContent,
       'change-inline-style',
     );
 
-    editorState = EditorState.acceptSelection(editorState, finalSelection);
+    if (!finalSelection) {
+      let selectionOffset =
+        offset + (textString.length - markdownString.length + input.length);
 
-    if (toResetStyle) {
-      editorState = EditorState.setInlineStyleOverride(editorState, NONE_STYLE);
+      finalSelection = initialSelection.merge({
+        anchorOffset: selectionOffset,
+        focusOffset: selectionOffset,
+      }) as SelectionState;
     }
+
+    editorState = EditorState.acceptSelection(editorState, finalSelection);
 
     return editorState;
   };
