@@ -5,8 +5,11 @@ import {
   Modifier,
   SelectionState,
 } from 'draft-js';
+import {OrderedSet} from 'immutable';
 
 import {Feature, FeatureOptions} from '../feature';
+
+const NONE_STYLE: DraftInlineStyle = OrderedSet();
 
 export interface InlineFeatureMatchResult {
   markdown: string[];
@@ -30,7 +33,7 @@ export function createInlineFeature({
   return function processInlineFeature(
     editorState: EditorState,
     {
-      character,
+      trigger: {input = '', command},
       selection,
       offset,
       block,
@@ -81,22 +84,55 @@ export function createInlineFeature({
       return editorState;
     }
 
-    let content = editorState.getCurrentContent();
+    let finalSelection: SelectionState | undefined;
+    let toResetStyle = false;
 
     // insert character
 
-    content = Modifier.insertText(content, selection, character);
+    if (input) {
+      let insertionContent = editorState.getCurrentContent();
 
-    editorState = EditorState.push(editorState, content, 'insert-characters');
+      insertionContent = Modifier.insertText(
+        insertionContent,
+        selection,
+        input,
+        block.getInlineStyleAt(offset),
+      );
 
-    editorState = EditorState.acceptSelection(
-      editorState,
-      content.getSelectionAfter(),
-    );
+      editorState = EditorState.push(
+        editorState,
+        insertionContent,
+        'insert-characters',
+      );
+
+      editorState = EditorState.acceptSelection(
+        editorState,
+        insertionContent.getSelectionAfter(),
+      );
+    } else if (command === 'split-block') {
+      let splittingContent = editorState.getCurrentContent();
+
+      splittingContent = Modifier.splitBlock(splittingContent, selection);
+
+      finalSelection = splittingContent.getSelectionAfter();
+
+      editorState = EditorState.push(
+        editorState,
+        splittingContent,
+        'split-block',
+      );
+
+      editorState = EditorState.acceptSelection(editorState, finalSelection);
+
+      toResetStyle = true;
+    } else {
+      return editorState;
+    }
 
     // replace markdown with styled text
 
     let replacementOffset = offset - markdownString.length;
+    let replacementContent = editorState.getCurrentContent();
 
     for (let [index, source] of markdown.entries()) {
       let unescaped = text[index];
@@ -108,22 +144,37 @@ export function createInlineFeature({
 
       let mergedStyle = block.getInlineStyleAt(replacementOffset).merge(style);
 
-      content = Modifier.replaceText(content, range, unescaped, mergedStyle);
+      replacementContent = Modifier.replaceText(
+        replacementContent,
+        range,
+        unescaped,
+        mergedStyle,
+      );
 
       replacementOffset += unescaped.length;
     }
 
-    editorState = EditorState.push(editorState, content, 'change-inline-style');
+    if (!finalSelection) {
+      let selectionOffset =
+        offset + (textString.length - markdownString.length + input.length);
 
-    let selectionOffset =
-      offset + (textString.length - markdownString.length + character.length);
+      finalSelection = selection.merge({
+        anchorOffset: selectionOffset,
+        focusOffset: selectionOffset,
+      }) as SelectionState;
+    }
 
-    let selectionRange = selection.merge({
-      anchorOffset: selectionOffset,
-      focusOffset: selectionOffset,
-    }) as SelectionState;
+    editorState = EditorState.push(
+      editorState,
+      replacementContent,
+      'change-inline-style',
+    );
 
-    editorState = EditorState.acceptSelection(editorState, selectionRange);
+    editorState = EditorState.acceptSelection(editorState, finalSelection);
+
+    if (toResetStyle) {
+      editorState = EditorState.setInlineStyleOverride(editorState, NONE_STYLE);
+    }
 
     return editorState;
   };

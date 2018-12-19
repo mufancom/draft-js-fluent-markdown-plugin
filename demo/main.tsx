@@ -1,3 +1,5 @@
+import 'draft-js/dist/Draft.css';
+
 import {EditorState} from 'draft-js';
 import Editor from 'draft-js-plugins-editor';
 import React, {Component, ReactNode} from 'react';

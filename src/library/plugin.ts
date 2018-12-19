@@ -1,8 +1,7 @@
 import {DraftHandleValue, EditorState} from 'draft-js';
 import {EditorPluginFunctions} from 'draft-js-plugins-editor';
-import {SyntheticEvent} from 'react';
 
-import {Feature, FeatureOptions} from './feature';
+import {Feature, FeatureOptions, FeatureTrigger} from './feature';
 import {FULL_FEATURES} from './features';
 
 export interface FluentMarkdownPluginOptions {
@@ -17,10 +16,45 @@ export class FluentMarkdownPlugin {
   }
 
   handleBeforeInput = (
-    character: string,
+    input: string,
     editorState: EditorState,
     {setEditorState}: EditorPluginFunctions,
   ): DraftHandleValue => {
+    let nextEditorState = this.triggerFeature(editorState, {input});
+
+    if (nextEditorState) {
+      setEditorState(nextEditorState);
+      return 'handled';
+    } else {
+      return 'not-handled';
+    }
+  };
+
+  handleKeyCommand = (
+    command: string,
+    editorState: EditorState,
+    {setEditorState}: EditorPluginFunctions,
+  ): DraftHandleValue => {
+    let nextEditorState: EditorState | undefined;
+
+    switch (command) {
+      case 'split-block':
+        nextEditorState = this.triggerFeature(editorState, {command});
+        break;
+    }
+
+    if (nextEditorState) {
+      setEditorState(nextEditorState);
+      return 'handled';
+    } else {
+      return 'not-handled';
+    }
+  };
+
+  private triggerFeature(
+    editorState: EditorState,
+    trigger: FeatureTrigger,
+  ): EditorState | undefined {
     let selection = editorState.getSelection();
     let content = editorState.getCurrentContent();
 
@@ -34,7 +68,7 @@ export class FluentMarkdownPlugin {
 
     let options: FeatureOptions = {
       offset,
-      character,
+      trigger,
       content,
       selection,
       block,
@@ -47,21 +81,12 @@ export class FluentMarkdownPlugin {
       let nextEditorState = feature(editorState, options);
 
       if (nextEditorState !== editorState) {
-        setEditorState(nextEditorState);
-        return 'handled';
+        return nextEditorState;
       }
     }
 
-    return 'not-handled';
-  };
-
-  handleReturn = (
-    _event: SyntheticEvent,
-    editorState: EditorState,
-    functions: EditorPluginFunctions,
-  ): DraftHandleValue => {
-    return this.handleBeforeInput('\n', editorState, functions);
-  };
+    return undefined;
+  }
 }
 
 export function createFluentMarkdownPlugin(

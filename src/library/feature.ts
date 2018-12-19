@@ -5,9 +5,14 @@ import {
   SelectionState,
 } from 'draft-js';
 
+export interface FeatureTrigger {
+  input?: string;
+  command?: string;
+}
+
 export interface FeatureOptions {
   offset: number;
-  character: string;
+  trigger: FeatureTrigger;
   content: ContentState;
   selection: SelectionState;
   block: ContentBlock;
