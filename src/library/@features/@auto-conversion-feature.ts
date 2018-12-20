@@ -220,9 +220,16 @@ export function createAutoConversionFeature({
           }) as SelectionState;
 
           let mergedStyle = block.getInlineStyleAt(sourceOffset).merge(style);
+          let entityKey = block.getEntityAt(sourceOffset);
 
           return [
-            Modifier.replaceText(content, range, unescaped, mergedStyle),
+            Modifier.replaceText(
+              content,
+              range,
+              unescaped,
+              mergedStyle,
+              entityKey,
+            ),
             sourceOffset + source.length,
             offset + unescaped.length,
           ];
