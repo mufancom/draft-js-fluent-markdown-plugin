@@ -4,9 +4,9 @@ import {
   EditorState,
   Modifier,
 } from 'draft-js';
-import {OrderedSet} from 'immutable';
+import * as Immutable from 'immutable';
 
-const EMPTY_STYLE: DraftInlineStyle = OrderedSet();
+const EMPTY_STYLE: DraftInlineStyle = Immutable.OrderedSet();
 
 export function splitBlock(editorState: EditorState): EditorState {
   let content = editorState.getCurrentContent();

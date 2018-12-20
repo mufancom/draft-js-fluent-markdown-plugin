@@ -1,5 +1,5 @@
 import {DraftInlineStyle} from 'draft-js';
-import {OrderedSet} from 'immutable';
+import * as Immutable from 'immutable';
 
 import {Feature} from '../@feature';
 import {
@@ -13,7 +13,7 @@ import {createAutoConversionFeature} from './@auto-conversion-feature';
 const ASTERISK_BOLD_REGEX = /(?:^|[^*])(\*{2})((?:\\.|(?!\\|\*{2}).)+)(\*{2})$/;
 const UNDERLINE_BOLD_REGEX = /(?:^|[^_])(_{2})((?:\\.|(?!\\|_{2}).)+)(_{2})$/;
 
-const BOLD_STYLE: DraftInlineStyle = OrderedSet(['BOLD']);
+const BOLD_STYLE: DraftInlineStyle = Immutable.OrderedSet(['BOLD']);
 
 export function createBoldFeature(): Feature {
   return createAutoConversionFeature({

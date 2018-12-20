@@ -1,5 +1,5 @@
 import {DraftInlineStyle} from 'draft-js';
-import {OrderedSet} from 'immutable';
+import * as Immutable from 'immutable';
 
 import {Feature} from '../@feature';
 import {
@@ -12,7 +12,7 @@ import {createAutoConversionFeature} from './@auto-conversion-feature';
 
 const CODE_REGEX = /(?:^|[^`])(`)((?:\\.|(?![`\\]).)+)(`)$/;
 
-const CODE_STYLE: DraftInlineStyle = OrderedSet(['CODE']);
+const CODE_STYLE: DraftInlineStyle = Immutable.OrderedSet(['CODE']);
 
 export function createCodeFeature(): Feature {
   return createAutoConversionFeature({

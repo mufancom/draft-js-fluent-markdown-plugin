@@ -1,5 +1,5 @@
 import {DraftInlineStyle} from 'draft-js';
-import {OrderedSet} from 'immutable';
+import * as Immutable from 'immutable';
 
 import {Feature} from '../@feature';
 import {
@@ -12,7 +12,9 @@ import {createAutoConversionFeature} from './@auto-conversion-feature';
 
 const STRIKETHROUGH_REGEX = /(?:^|[^~])(~{2})((?:\\.|(?!\\|~{2}).)+)(~{2})$/;
 
-const STRIKETHROUGH_STYLE: DraftInlineStyle = OrderedSet(['STRIKETHROUGH']);
+const STRIKETHROUGH_STYLE: DraftInlineStyle = Immutable.OrderedSet([
+  'STRIKETHROUGH',
+]);
 
 export function createStrikethroughFeature(): Feature {
   return createAutoConversionFeature({

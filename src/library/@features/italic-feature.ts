@@ -1,5 +1,5 @@
 import {DraftInlineStyle} from 'draft-js';
-import {OrderedSet} from 'immutable';
+import * as Immutable from 'immutable';
 
 import {Feature} from '../@feature';
 import {
@@ -13,7 +13,7 @@ import {createAutoConversionFeature} from './@auto-conversion-feature';
 const ASTERISK_ITALIC_REGEX = /(?:^|[^*])(\*)((?:\\.|(?!\\|\*).)+)(\*)$/;
 const UNDERLINE_ITALIC_REGEX = /(?:^|[^_])(_)((?:\\.|(?!\\|_).)+)(_)$/;
 
-const ITALIC_STYLE: DraftInlineStyle = OrderedSet(['ITALIC']);
+const ITALIC_STYLE: DraftInlineStyle = Immutable.OrderedSet(['ITALIC']);
 
 export function createItalicFeature(): Feature {
   return createAutoConversionFeature({

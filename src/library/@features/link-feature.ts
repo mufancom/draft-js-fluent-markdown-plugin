@@ -1,5 +1,5 @@
 import {DraftInlineStyle} from 'draft-js';
-import {OrderedSet} from 'immutable';
+import * as Immutable from 'immutable';
 
 import {Feature} from '../@feature';
 import {
@@ -12,7 +12,7 @@ import {createAutoConversionFeature} from './@auto-conversion-feature';
 
 const LINK_REGEX = /(\[)((?:\\.|(?!\]).)+)(\]\(((?:\\.|(?![\\)])\S)+?)\))$/;
 
-const LINK_STYLE: DraftInlineStyle = OrderedSet(['LINK']);
+const LINK_STYLE: DraftInlineStyle = Immutable.OrderedSet(['LINK']);
 
 export function createLinkFeature(): Feature {
   return createAutoConversionFeature({
