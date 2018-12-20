@@ -1,5 +1,4 @@
 import {
-  BlockMapBuilder,
   CharacterMetadata,
   ContentBlock,
   ContentState,
@@ -7,8 +6,6 @@ import {
   DraftInlineStyle,
   EditorState,
   Modifier,
-  SelectionState,
-  genKey,
 } from 'draft-js';
 import * as Immutable from 'immutable';
 
@@ -21,46 +18,6 @@ export function splitBlockAndPush(editorState: EditorState): EditorState {
   content = Modifier.splitBlock(content, selection);
 
   return EditorState.push(editorState, content, 'split-block');
-}
-
-export function insertAtomicBlock(
-  content: ContentState,
-  selection: SelectionState,
-  entityKey: string,
-): ContentState {
-  content = Modifier.removeRange(content, selection, 'backward');
-
-  if (selection.getStartOffset() > 0) {
-    content = Modifier.splitBlock(content, content.getSelectionAfter());
-  }
-
-  let range = content.getSelectionAfter();
-
-  content = Modifier.setBlockType(content, range, 'atomic');
-
-  let metadata = CharacterMetadata.create({entity: entityKey});
-  let character = '\u200b';
-
-  let atomicBlockConfig = {
-    key: genKey(),
-    type: 'atomic',
-    text: character,
-    characterList: Immutable.List(Immutable.Repeat(metadata, character.length)),
-  };
-
-  let atomicDividerBlockConfig = {
-    key: genKey(),
-    type: 'unstyled',
-  };
-
-  let fragmentArray = [
-    new ContentBlock(atomicBlockConfig),
-    new ContentBlock(atomicDividerBlockConfig),
-  ];
-
-  let fragment = BlockMapBuilder.createFromArray(fragmentArray);
-
-  return Modifier.replaceWithFragment(content, range, fragment);
 }
 
 export function handleInlineStyleOverriding(

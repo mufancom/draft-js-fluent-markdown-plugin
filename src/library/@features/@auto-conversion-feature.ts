@@ -1,5 +1,6 @@
 import {
   CharacterMetadata,
+  ContentBlock,
   ContentState,
   DraftEntityMutability,
   DraftInlineStyle,
@@ -9,7 +10,6 @@ import {
 } from 'draft-js';
 
 import {Feature} from '../@feature';
-import {insertAtomicBlock, splitBlockAndPush} from '../@utils';
 
 export interface AutoConversionFeatureMatchEntityDescriptor {
   type: string;
@@ -130,20 +130,14 @@ export function createAutoConversionFeature({
     let initialSelection = editorState.getSelection();
     let finalSelection: SelectionState | undefined;
 
-    // insert character
+    let content = editorState.getCurrentContent();
+
+    ////////////////////
+    // PHASE 1: INPUT //
+    ////////////////////
 
     if (input) {
-      if (input === blockTextAfterOffset[0]) {
-        let selection = SelectionState.createEmpty(blockKey).merge({
-          anchorOffset: initialSelection.getAnchorOffset() + input.length,
-          focusOffset: initialSelection.getFocusOffset() + input.length,
-          hasFocus: true,
-        }) as SelectionState;
-
-        editorState = EditorState.acceptSelection(editorState, selection);
-      } else {
-        let content = editorState.getCurrentContent();
-
+      if (input !== blockTextAfterOffset[0]) {
         content = Modifier.insertText(
           content,
           initialSelection,
@@ -156,38 +150,30 @@ export function createAutoConversionFeature({
           content,
           'insert-characters',
         );
-
-        editorState = EditorState.acceptSelection(
-          editorState,
-          content.getSelectionAfter(),
-        );
       }
     } else if (command === 'split-block') {
-      // atomic block will naturally have a sibling block
-      if (!atomic) {
-        editorState = splitBlockAndPush(editorState);
-        finalSelection = editorState.getCurrentContent().getSelectionAfter();
-      }
+      content = Modifier.splitBlock(content, initialSelection);
+
+      finalSelection = content.getSelectionAfter();
+
+      editorState = EditorState.push(editorState, content, 'split-block');
     } else {
       return editorState;
     }
 
-    // replace markdown with styled text
+    ////////////////////////
+    // PHASE 2: TRANSFORM //
+    ////////////////////////
 
-    let replacementContent = editorState.getCurrentContent();
-    let finalRange: SelectionState;
+    let finalSelectionAfter: SelectionState;
     let entityKey: string | undefined;
 
     if (entityDescriptor) {
       let {type, mutability, data} = entityDescriptor;
 
-      replacementContent = replacementContent.createEntity(
-        type,
-        mutability,
-        data,
-      );
+      content = content.createEntity(type, mutability, data);
 
-      entityKey = replacementContent.getLastCreatedEntityKey();
+      entityKey = content.getLastCreatedEntityKey();
     }
 
     if (atomic) {
@@ -195,22 +181,70 @@ export function createAutoConversionFeature({
         throw new Error('Entity descriptor is required for atomic block');
       }
 
-      let range = SelectionState.createEmpty(blockKey).merge({
+      // 1. replace image markdown with zero-width character.
+
+      let sourceRange = SelectionState.createEmpty(blockKey).merge({
         anchorOffset: offsetBeforeMarkdown,
         focusOffset: offset,
       }) as SelectionState;
 
-      replacementContent = insertAtomicBlock(
-        replacementContent,
-        range,
+      let character = '\u200b';
+
+      content = Modifier.replaceText(
+        content,
+        sourceRange,
+        character,
+        undefined,
         entityKey,
       );
 
-      finalRange = replacementContent.getSelectionAfter();
+      // 2. if it's not at the beginning of the block, split it.
+
+      let atomicBlockKey: string;
+      let atomicBlock: ContentBlock;
+
+      if (offsetBeforeMarkdown > 0) {
+        let sourceStart = SelectionState.createEmpty(blockKey).merge({
+          anchorOffset: offsetBeforeMarkdown,
+          focusOffset: offsetBeforeMarkdown,
+        }) as SelectionState;
+
+        content = Modifier.splitBlock(content, sourceStart);
+
+        atomicBlockKey = content.getKeyAfter(blockKey);
+      } else {
+        atomicBlockKey = blockKey;
+      }
+
+      // 3. if there are extra characters after the atomic content, split it.
+
+      atomicBlock = content.getBlockForKey(atomicBlockKey);
+
+      if (character.length < atomicBlock.getLength()) {
+        let atomicBlockEnd = SelectionState.createEmpty(atomicBlockKey).merge({
+          anchorOffset: character.length,
+          focusOffset: character.length,
+        }) as SelectionState;
+
+        content = Modifier.splitBlock(content, atomicBlockEnd);
+      }
+
+      // 4. and now it's a good time to record selection range.
+
+      finalSelectionAfter = content.getSelectionAfter();
+
+      // 5. transform the block to atomic block.
+
+      let atomicBlockRange = SelectionState.createEmpty(atomicBlockKey).merge({
+        anchorOffset: 0,
+        focusOffset: character.length,
+      }) as SelectionState;
+
+      content = Modifier.setBlockType(content, atomicBlockRange, 'atomic');
     } else {
-      [replacementContent] = markdownFragments.reduce<
-        [ContentState, number, number]
-      >(
+      // replace the markdown one fragment by another to preserve character
+      // styles.
+      [content] = markdownFragments.reduce<[ContentState, number, number]>(
         ([content, sourceOffset, offset], source, index) => {
           let unescaped = textFragments[index];
 
@@ -234,40 +268,36 @@ export function createAutoConversionFeature({
             offset + unescaped.length,
           ];
         },
-        [replacementContent, offsetBeforeMarkdown, offsetBeforeMarkdown],
+        [content, offsetBeforeMarkdown, offsetBeforeMarkdown],
       );
 
-      let range = SelectionState.createEmpty(blockKey).merge({
+      finalSelectionAfter = content.getSelectionAfter();
+
+      let textRange = SelectionState.createEmpty(blockKey).merge({
         anchorOffset: offsetBeforeMarkdown,
         focusOffset: offsetBeforeMarkdown + text.length,
       }) as SelectionState;
 
-      finalRange = replacementContent.getSelectionAfter();
-
       if (entityKey) {
-        replacementContent = Modifier.applyEntity(
-          replacementContent,
-          range,
-          entityKey,
-        );
+        content = Modifier.applyEntity(content, textRange, entityKey);
       }
     }
 
-    editorState = EditorState.push(
-      editorState,
-      replacementContent,
-      'change-inline-style',
-    );
-
     if (!finalSelection) {
-      finalSelection = finalRange.merge({
-        anchorOffset: finalRange.getAnchorOffset() + input.length,
-        focusOffset: finalRange.getFocusOffset() + input.length,
+      finalSelection = finalSelectionAfter.merge({
+        anchorOffset: finalSelectionAfter.getAnchorOffset() + input.length,
+        focusOffset: finalSelectionAfter.getFocusOffset() + input.length,
         hasFocus: true,
       }) as SelectionState;
     }
 
-    editorState = EditorState.acceptSelection(editorState, finalSelection);
+    content = content.merge({
+      selectionAfter: finalSelection,
+    }) as ContentState;
+
+    editorState = EditorState.push(editorState, content, 'change-inline-style');
+
+    // editorState = EditorState.acceptSelection(editorState, finalSelection);
 
     return editorState;
   };
