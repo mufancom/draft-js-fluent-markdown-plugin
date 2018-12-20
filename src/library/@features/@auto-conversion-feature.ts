@@ -8,7 +8,7 @@ import {
   SelectionState,
 } from 'draft-js';
 
-import {Feature, FeatureOptions} from '../@feature';
+import {Feature} from '../@feature';
 import {splitBlock} from '../@utils';
 
 export interface AutoConversionFeatureMatchEntityDescriptor {
@@ -43,8 +43,8 @@ export function createAutoConversionFeature({
   matcher,
   compatibilityTester,
 }: AutoConversionFeatureOptions): Feature {
-  return function processInlineFeature(
-    editorState: EditorState,
+  return (
+    editorState,
     {
       trigger: {input = '', command},
       offset,
@@ -52,8 +52,8 @@ export function createAutoConversionFeature({
       blockKey,
       blockTextBeforeOffset,
       blockTextAfterOffset,
-    }: FeatureOptions,
-  ): EditorState {
+    },
+  ) => {
     let result = matcher(blockTextBeforeOffset, blockTextAfterOffset);
 
     if (!result) {
@@ -131,21 +131,34 @@ export function createAutoConversionFeature({
     // insert character
 
     if (input) {
-      let content = editorState.getCurrentContent();
+      if (input === blockTextAfterOffset[0]) {
+        let selection = initialSelection.merge({
+          anchorOffset: initialSelection.getAnchorOffset() + input.length,
+          focusOffset: initialSelection.getFocusOffset() + input.length,
+        }) as SelectionState;
 
-      content = Modifier.insertText(
-        content,
-        initialSelection,
-        input,
-        block.getInlineStyleAt(offset),
-      );
+        editorState = EditorState.acceptSelection(editorState, selection);
+      } else {
+        let content = editorState.getCurrentContent();
 
-      editorState = EditorState.push(editorState, content, 'insert-characters');
+        content = Modifier.insertText(
+          content,
+          initialSelection,
+          input,
+          block.getInlineStyleAt(offset),
+        );
 
-      editorState = EditorState.acceptSelection(
-        editorState,
-        content.getSelectionAfter(),
-      );
+        editorState = EditorState.push(
+          editorState,
+          content,
+          'insert-characters',
+        );
+
+        editorState = EditorState.acceptSelection(
+          editorState,
+          content.getSelectionAfter(),
+        );
+      }
     } else if (command === 'split-block') {
       editorState = splitBlock(editorState);
 
