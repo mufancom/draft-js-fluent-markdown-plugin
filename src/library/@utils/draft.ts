@@ -86,22 +86,15 @@ export function handleInlineStyleOverriding(
     return EditorState.setInlineStyleOverride(editorState, EMPTY_STYLE);
   }
 
-  // Code boundary
+  // Style boundary
 
   let leftStyle = block.getInlineStyleAt(startOffset - 1);
   let rightStyle = block.getInlineStyleAt(endOffset);
 
-  if (startOffset === 0 && rightStyle.has('CODE')) {
+  if (!leftStyle.equals(rightStyle)) {
     return EditorState.setInlineStyleOverride(
       editorState,
-      rightStyle.delete('CODE'),
-    );
-  }
-
-  if (leftStyle.has('CODE') && !rightStyle.has('CODE')) {
-    return EditorState.setInlineStyleOverride(
-      editorState,
-      leftStyle.delete('CODE'),
+      leftStyle.intersect(rightStyle),
     );
   }
 
