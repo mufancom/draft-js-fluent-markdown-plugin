@@ -43,11 +43,21 @@ export function handleInlineStyleOverriding(
 
   // Code boundary
 
-  let currentStyle = block.getInlineStyleAt(startOffset - 1);
-  let nextStyle = block.getInlineStyleAt(endOffset);
+  let leftStyle = block.getInlineStyleAt(startOffset - 1);
+  let rightStyle = block.getInlineStyleAt(endOffset);
 
-  if (currentStyle.has('CODE') && !nextStyle.has('CODE')) {
-    return EditorState.setInlineStyleOverride(editorState, nextStyle);
+  if (startOffset === 0 && rightStyle.has('CODE')) {
+    return EditorState.setInlineStyleOverride(
+      editorState,
+      rightStyle.delete('CODE'),
+    );
+  }
+
+  if (leftStyle.has('CODE') && !rightStyle.has('CODE')) {
+    return EditorState.setInlineStyleOverride(
+      editorState,
+      leftStyle.delete('CODE'),
+    );
   }
 
   return editorState;
