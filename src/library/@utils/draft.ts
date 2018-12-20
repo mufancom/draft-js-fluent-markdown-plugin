@@ -53,14 +53,10 @@ export function handleInlineStyleOverriding(
   return editorState;
 }
 
-export function isCharacterEntityAlike(metadata: CharacterMetadata): boolean {
-  return !!metadata.getEntity() || metadata.hasStyle('CODE');
-}
-
-export function characterListContainsEntityAlike(
+export function characterListContainsEntity(
   list: CharacterMetadata[],
 ): boolean {
-  return list.some(metadata => isCharacterEntityAlike(metadata));
+  return list.some(metadata => !!metadata.getEntity());
 }
 
 export function testCharacterListConsistency([

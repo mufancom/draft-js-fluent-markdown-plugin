@@ -3,14 +3,14 @@ import * as Immutable from 'immutable';
 
 import {Feature} from '../@feature';
 import {
-  characterListContainsEntityAlike,
+  characterListContainsEntity,
   testCharacterListConsistency,
   unescapeMarkdown,
 } from '../@utils';
 
 import {createAutoConversionFeature} from './@auto-conversion-feature';
 
-const LINK_REGEX = /(\[)((?:\\.|(?!\]).)+)(\]\(((?:\\.|(?![\\)])\S)+?)\))$/;
+const LINK_REGEX = /(?:^|[^!])(\[)((?:\\.|(?!\]).)+)(\]\(((?:\\.|(?![\\)])\S)+?)\))$/;
 
 const LINK_STYLE: DraftInlineStyle = Immutable.OrderedSet(['LINK']);
 
@@ -45,11 +45,10 @@ export function createLinkFeature(): Feature {
       };
     },
     compatibilityTester(opening, content, closing) {
-      let list = [...opening, ...content, ...closing];
-
       return (
-        !characterListContainsEntityAlike(list) &&
-        testCharacterListConsistency(list)
+        testCharacterListConsistency(opening) &&
+        testCharacterListConsistency(closing) &&
+        !characterListContainsEntity([...opening, ...content, ...closing])
       );
     },
   });
