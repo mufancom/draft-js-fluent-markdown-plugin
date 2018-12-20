@@ -3,6 +3,10 @@ import React, {FunctionComponent} from 'react';
 
 import {getCharacterEntityType, linkify} from '../@utils';
 
+export interface LinkEntityData {
+  href: string;
+}
+
 export interface LinkDecoratorOptions {
   /** Defaults to `'_blank'`. */
   target?: string;
@@ -20,9 +24,9 @@ export function createLinkDecorator({
     let href: string;
 
     if (entityKey) {
-      href = contentState.getEntity(entityKey).getData().href;
+      ({href} = contentState.getEntity(entityKey).getData() as LinkEntityData);
     } else {
-      href = linkify.match(decoratedText)![0].url;
+      ({url: href} = linkify.match(decoratedText)![0]);
     }
 
     return (

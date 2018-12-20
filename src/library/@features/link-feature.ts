@@ -24,13 +24,13 @@ export function createLinkFeature(): Feature {
         return undefined;
       }
 
-      let [, opening, textMarkdownSource, closing, urlMarkdownSource] = groups;
+      let [, opening, textMarkdownSource, closing, hrefMarkdownSource] = groups;
 
       let {markdownFragments, textFragments} = unescapeMarkdown(
         textMarkdownSource,
       );
 
-      let {text: href} = unescapeMarkdown(urlMarkdownSource);
+      let {text: href} = unescapeMarkdown(hrefMarkdownSource);
 
       return {
         opening,

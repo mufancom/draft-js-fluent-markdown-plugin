@@ -1,7 +1,12 @@
 {
   "name": "draft-js-fluent-markdown-plugin",
   "version": "0.1.0",
-  "scripts": {},
+  "scripts": {
+    "build:library": "rimraf bld/library && tsc -p src/library",
+    "lint:library": "tslint -p src/library",
+    "test:library": "yarn build:library && yarn lint:library",
+    "test": "yarn test:library"
+  },
   "main": "bld/library/index.js",
   "author": "Chengdu Mufan Technology Co., Ltd.",
   "license": "MIT",
@@ -29,6 +34,7 @@
     "prettier": "^1.15.3",
     "react": "^16.6.3",
     "react-dom": "^16.6.3",
+    "rimraf": "^2.6.2",
     "tslint": "^5.11.0",
     "tslint-language-service": "^0.9.9",
     "typescript": "^3.2.2"

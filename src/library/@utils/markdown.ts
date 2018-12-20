@@ -2,6 +2,7 @@ const ESCAPED_ASCII_PUNCTUATION_REGEX = /\\([!"#$%&'()*+,./:;<=>?@^_`{}~\[\]\\-]
 
 export interface UnescapeMarkdownResult {
   markdownFragments: string[];
+  markdown: string;
   textFragments: string[];
   text: string;
 }
@@ -22,6 +23,7 @@ export function unescapeMarkdown(source: string): UnescapeMarkdownResult {
 
   return {
     markdownFragments,
+    markdown: markdownFragments.join(''),
     textFragments,
     text: textFragments.join(''),
   };

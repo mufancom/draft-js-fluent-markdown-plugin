@@ -2,6 +2,11 @@ import {ContentBlock, ContentState} from 'draft-js';
 import {ComponentType} from 'react';
 
 declare module 'draft-js' {
+  interface DraftBlockRendererComponentProps {
+    block: ContentBlock;
+    contentState: ContentState;
+  }
+
   interface DraftDecoratorComponentProps {
     contentState: ContentState;
     decoratedText: string;
@@ -17,4 +22,6 @@ declare module 'draft-js' {
       contentState: ContentState,
     ): void;
   }
+
+  type DraftEntityInstance = ReturnType<ContentState['getEntity']>;
 }

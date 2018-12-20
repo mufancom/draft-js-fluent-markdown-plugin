@@ -1,2 +1,2 @@
-export * from './link-decorator';
 export * from './code-decorator';
+export * from './link-decorator';

@@ -1,6 +1,13 @@
-import {DraftDecorator, DraftHandleValue, EditorState} from 'draft-js';
+import {
+  ContentBlock,
+  DraftDecorator,
+  DraftHandleValue,
+  EditorState,
+} from 'draft-js';
 import {EditorPluginFunctions} from 'draft-js-plugins-editor';
 
+import {AtomicDescriptor, AtomicDescriptorEntry} from './@atomic';
+import {createImageAtomicComponentEntry} from './@atomics';
 import {
   LinkDecoratorOptions,
   createCodeDecorator,
@@ -10,11 +17,16 @@ import {Feature, FeatureOptions, FeatureTrigger} from './@feature';
 import {
   createBoldFeature,
   createCodeFeature,
+  createImageFeature,
   createItalicFeature,
   createLinkFeature,
   createStrikethroughFeature,
 } from './@features';
-import {handleInlineStyleOverriding, splitBlock} from './@utils';
+import {
+  getBlockEntityTypeAt,
+  handleInlineStyleOverriding,
+  splitBlockAndPush,
+} from './@utils';
 
 export interface FluentMarkdownPluginLinkOptions extends LinkDecoratorOptions {}
 
@@ -24,21 +36,59 @@ export interface FluentMarkdownPluginOptions {
 }
 
 export class FluentMarkdownPlugin {
-  readonly decorators: DraftDecorator[];
+  decorators: DraftDecorator[];
+
+  private atomicDescriptorMap: Map<string, AtomicDescriptor>;
 
   private features: Feature[];
 
-  constructor({link: linkOptions = {}}: FluentMarkdownPluginOptions) {
+  constructor({
+    block = true,
+    link: linkOptions = {},
+  }: FluentMarkdownPluginOptions) {
     this.decorators = [createCodeDecorator(), createLinkDecorator(linkOptions)];
 
-    this.features = [
+    let atomicComponentEntries: AtomicDescriptorEntry[] = [];
+
+    let features: Feature[] = [
       createBoldFeature(),
       createItalicFeature(),
       createStrikethroughFeature(),
       createCodeFeature(),
       createLinkFeature(),
     ];
+
+    if (block) {
+      atomicComponentEntries.push(createImageAtomicComponentEntry());
+
+      features.push(createImageFeature());
+    }
+
+    this.atomicDescriptorMap = new Map(atomicComponentEntries);
+
+    this.features = features;
   }
+
+  blockRendererFn = (
+    block: ContentBlock,
+    {getEditorState}: EditorPluginFunctions,
+  ): unknown => {
+    if (block.getType() !== 'atomic') {
+      return undefined;
+    }
+
+    let contentState = getEditorState().getCurrentContent();
+
+    let entityType = getBlockEntityTypeAt(block, 0, contentState);
+
+    if (!entityType) {
+      return undefined;
+    }
+
+    let descriptor = this.atomicDescriptorMap.get(entityType);
+
+    return descriptor && {...descriptor, editable: false};
+  };
 
   handleBeforeInput = (
     input: string,
@@ -67,7 +117,7 @@ export class FluentMarkdownPlugin {
         nextEditorState = this.triggerFeature(editorState, {command});
 
         if (!nextEditorState) {
-          nextEditorState = splitBlock(editorState);
+          nextEditorState = splitBlockAndPush(editorState);
         }
 
         break;
