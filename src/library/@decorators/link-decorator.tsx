@@ -1,11 +1,7 @@
-import {
-  CharacterMetadata,
-  DraftDecorator,
-  DraftDecoratorComponentProps,
-} from 'draft-js';
+import {DraftDecorator, DraftDecoratorComponentProps} from 'draft-js';
 import React, {FunctionComponent} from 'react';
 
-import {linkify} from '../@utils';
+import {getCharacterEntityType, linkify} from '../@utils';
 
 export interface LinkDecoratorOptions {
   /** Defaults to `'_blank'`. */
@@ -39,26 +35,24 @@ export function createLinkDecorator({
   return {
     component: Link,
     strategy(block, callback, contentState) {
-      let text = block.getText();
+      let entityRanges: [number, number][] = [];
 
-      text = block
-        .getCharacterList()
-        .map((metadata: CharacterMetadata, index: number) => {
-          let entityKey = metadata.getEntity();
+      block.findEntityRanges(
+        metadata => getCharacterEntityType(metadata, contentState) === 'LINK',
+        (start, end) => {
+          entityRanges.push([start, end]);
+          callback(start, end);
+        },
+      );
 
-          if (entityKey) {
-            let entityType = contentState.getEntity(entityKey).getType();
+      let characters = block.getText().split('');
 
-            if (entityType === 'LINK') {
-              callback(index, index + 1);
-            }
+      for (let [start, end] of entityRanges) {
+        let length = end - start;
+        characters.splice(start, end - start, ''.padEnd(length));
+      }
 
-            return ' ';
-          } else {
-            return text[index];
-          }
-        })
-        .join('');
+      let text = characters.join('');
 
       let links = linkify.match(text);
 

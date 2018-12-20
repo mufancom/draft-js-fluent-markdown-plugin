@@ -1,5 +1,6 @@
 import {
   CharacterMetadata,
+  ContentState,
   DraftInlineStyle,
   EditorState,
   Modifier,
@@ -52,16 +53,14 @@ export function handleInlineStyleOverriding(
   return editorState;
 }
 
-export function isCharacterMetadataEntityAlike(
-  metadata: CharacterMetadata,
-): boolean {
+export function isCharacterEntityAlike(metadata: CharacterMetadata): boolean {
   return !!metadata.getEntity() || metadata.hasStyle('CODE');
 }
 
 export function characterListContainsEntityAlike(
   list: CharacterMetadata[],
 ): boolean {
-  return list.some(metadata => isCharacterMetadataEntityAlike(metadata));
+  return list.some(metadata => isCharacterEntityAlike(metadata));
 }
 
 export function testCharacterListConsistency([
@@ -81,4 +80,12 @@ export function testCharacterListConsistency([
   }
 
   return true;
+}
+
+export function getCharacterEntityType(
+  metadata: CharacterMetadata,
+  contentState: ContentState,
+): string | undefined {
+  let entityKey = metadata.getEntity();
+  return entityKey ? contentState.getEntity(entityKey).getType() : undefined;
 }

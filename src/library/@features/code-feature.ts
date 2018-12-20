@@ -33,6 +33,10 @@ export function createCodeFeature(): Feature {
         closing,
         markdownFragments,
         textFragments,
+        entity: {
+          type: 'CODE',
+          mutability: 'MUTABLE',
+        },
       };
     },
     compatibilityTester(opening, content, closing) {

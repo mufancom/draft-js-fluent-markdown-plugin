@@ -14,7 +14,7 @@ import {splitBlock} from '../@utils';
 export interface AutoConversionFeatureMatchEntityDescriptor {
   type: string;
   mutability: DraftEntityMutability;
-  data: object;
+  data?: object;
 }
 
 export interface AutoConversionFeatureMatchResult {

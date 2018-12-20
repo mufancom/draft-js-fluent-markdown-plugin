@@ -1,7 +1,11 @@
 import {DraftDecorator, DraftHandleValue, EditorState} from 'draft-js';
 import {EditorPluginFunctions} from 'draft-js-plugins-editor';
 
-import {LinkDecoratorOptions, createLinkDecorator} from './@decorators';
+import {
+  LinkDecoratorOptions,
+  createCodeDecorator,
+  createLinkDecorator,
+} from './@decorators';
 import {Feature, FeatureOptions, FeatureTrigger} from './@feature';
 import {
   createBoldFeature,
@@ -25,7 +29,7 @@ export class FluentMarkdownPlugin {
   private features: Feature[];
 
   constructor({link: linkOptions = {}}: FluentMarkdownPluginOptions) {
-    this.decorators = [createLinkDecorator(linkOptions)];
+    this.decorators = [createCodeDecorator(), createLinkDecorator(linkOptions)];
 
     this.features = [
       createBoldFeature(),
