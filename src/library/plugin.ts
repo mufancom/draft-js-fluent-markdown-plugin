@@ -3,8 +3,10 @@ import {
   DraftDecorator,
   DraftHandleValue,
   EditorState,
+  RichUtils,
 } from 'draft-js';
 import {EditorPluginFunctions} from 'draft-js-plugins-editor';
+import {KeyboardEvent} from 'react';
 
 import {AtomicDescriptor, AtomicDescriptorEntry} from './@atomic';
 import {createImageAtomicComponentEntry} from './@atomics';
@@ -21,6 +23,7 @@ import {
   createImageFeature,
   createItalicFeature,
   createLinkFeature,
+  createListFeature,
   createStrikethroughFeature,
 } from './@features';
 import {getBlockEntityTypeAt, handleInlineStyleOverriding} from './@utils';
@@ -58,13 +61,33 @@ export class FluentMarkdownPlugin {
     if (block) {
       atomicComponentEntries.push(createImageAtomicComponentEntry());
 
-      features.push(createImageFeature(), createHeaderFeature());
+      features.push(
+        createImageFeature(),
+        createHeaderFeature(),
+        createListFeature(),
+      );
     }
 
     this.atomicDescriptorMap = new Map(atomicComponentEntries);
 
     this.features = features;
   }
+
+  onTab = (
+    event: KeyboardEvent,
+    {getEditorState, setEditorState}: EditorPluginFunctions,
+  ): DraftHandleValue => {
+    let editorState = getEditorState();
+
+    let nextEditorState = RichUtils.onTab(event, editorState, 4);
+
+    if (nextEditorState !== editorState) {
+      setEditorState(nextEditorState);
+      return 'handled';
+    } else {
+      return 'not-handled';
+    }
+  };
 
   blockRendererFn = (
     block: ContentBlock,

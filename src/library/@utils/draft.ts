@@ -5,19 +5,23 @@ import {
   DraftEntityInstance,
   DraftInlineStyle,
   EditorState,
-  Modifier,
 } from 'draft-js';
 import * as Immutable from 'immutable';
 
 const EMPTY_STYLE: DraftInlineStyle = Immutable.OrderedSet();
 
-export function splitBlockAndPush(editorState: EditorState): EditorState {
-  let content = editorState.getCurrentContent();
-  let selection = editorState.getSelection();
+export function setBlockDepth(
+  content: ContentState,
+  key: string,
+  depth: number,
+): ContentState {
+  let block = content.getBlockForKey(key);
+  let blockMap = content.getBlockMap();
 
-  content = Modifier.splitBlock(content, selection);
+  block = block.merge({depth}) as ContentBlock;
+  blockMap = blockMap.set(key, block);
 
-  return EditorState.push(editorState, content, 'split-block');
+  return content.merge({blockMap}) as ContentState;
 }
 
 export function handleInlineStyleOverriding(

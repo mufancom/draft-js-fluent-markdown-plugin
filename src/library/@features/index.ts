@@ -5,3 +5,4 @@ export * from './strikethrough-feature';
 export * from './link-feature';
 export * from './image-feature';
 export * from './header-feature';
+export * from './list-feature';
