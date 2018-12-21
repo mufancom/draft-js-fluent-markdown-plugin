@@ -8,7 +8,7 @@ import {
   unescapeMarkdown,
 } from '../@utils';
 
-import {createAutoConversionFeature} from './@auto-conversion-feature';
+import {createAutoTransformFeature} from './@auto-transform-feature';
 
 const STRIKETHROUGH_REGEX = /(?:^|[^~])(~{2})((?:\\.|(?!\\|~{2}).)+)(~{1,2})$/;
 
@@ -17,7 +17,7 @@ const STRIKETHROUGH_STYLE: DraftInlineStyle = Immutable.OrderedSet([
 ]);
 
 export function createStrikethroughFeature(): Feature {
-  return createAutoConversionFeature({
+  return createAutoTransformFeature({
     style: STRIKETHROUGH_STYLE,
     matcher(leftText, input) {
       let groups = STRIKETHROUGH_REGEX.exec(leftText + input);

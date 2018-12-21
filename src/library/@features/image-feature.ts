@@ -9,14 +9,14 @@ import {
   unescapeMarkdown,
 } from '../@utils';
 
-import {createAutoConversionFeature} from './@auto-conversion-feature';
+import {createAutoTransformFeature} from './@auto-transform-feature';
 
 const IMAGE_REGEX = /(!\[)((?:\\.|(?!\]).)*)(\]\(((?:\\.|(?![\\)])\S)+?)\))$/;
 
 const IMAGE_STYLE: DraftInlineStyle = Immutable.OrderedSet();
 
 export function createImageFeature(): Feature {
-  return createAutoConversionFeature({
+  return createAutoTransformFeature({
     style: IMAGE_STYLE,
     matcher(leftText, input) {
       let groups = IMAGE_REGEX.exec(leftText + input);

@@ -8,7 +8,7 @@ import {
   unescapeMarkdown,
 } from '../@utils';
 
-import {createAutoConversionFeature} from './@auto-conversion-feature';
+import {createAutoTransformFeature} from './@auto-transform-feature';
 
 const ASTERISK_BOLD_REGEX = /(\*{2})((?:\\.|(?!\\|\*{2}).)+)(\*{1,2})$/;
 const UNDERLINE_BOLD_REGEX = /(_{2})((?:\\.|(?!\\|_{2}).)+)(_{1,2})$/;
@@ -16,7 +16,7 @@ const UNDERLINE_BOLD_REGEX = /(_{2})((?:\\.|(?!\\|_{2}).)+)(_{1,2})$/;
 const BOLD_STYLE: DraftInlineStyle = Immutable.OrderedSet(['BOLD']);
 
 export function createBoldFeature(): Feature {
-  return createAutoConversionFeature({
+  return createAutoTransformFeature({
     style: BOLD_STYLE,
     matcher(leftText, input) {
       let leftTextWithInput = leftText + input;

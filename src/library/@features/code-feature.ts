@@ -8,14 +8,14 @@ import {
   unescapeMarkdown,
 } from '../@utils';
 
-import {createAutoConversionFeature} from './@auto-conversion-feature';
+import {createAutoTransformFeature} from './@auto-transform-feature';
 
 const CODE_REGEX = /(?:^|[^`])(`)((?:\\.|(?![`\\]).)+)(`)$/;
 
 const CODE_STYLE: DraftInlineStyle = Immutable.OrderedSet(['CODE']);
 
 export function createCodeFeature(): Feature {
-  return createAutoConversionFeature({
+  return createAutoTransformFeature({
     style: CODE_STYLE,
     matcher(leftText, input) {
       let groups = CODE_REGEX.exec(leftText + input);

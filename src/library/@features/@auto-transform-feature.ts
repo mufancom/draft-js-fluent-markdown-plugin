@@ -11,29 +11,29 @@ import {
 import {Feature} from '../@feature';
 import {testCharacterListConsistency} from '../@utils';
 
-export interface AutoConversionFeatureMatchEntityDescriptor {
+export interface AutoTransformFeatureMatchEntityDescriptor {
   type: string;
   mutability: DraftEntityMutability;
   data?: object;
 }
 
-export interface AutoConversionFeatureMatchResult {
+export interface AutoTransformFeatureMatchResult {
   type: 'pre-match' | 'match';
   opening: string;
   closing: string;
   markdownFragments: string[];
   textFragments: string[];
-  entity?: AutoConversionFeatureMatchEntityDescriptor;
+  entity?: AutoTransformFeatureMatchEntityDescriptor;
   atomic?: boolean;
 }
 
-export interface AutoConversionFeatureOptions {
+export interface AutoTransformFeatureOptions {
   style: DraftInlineStyle;
   matcher(
     leftText: string,
     input: string,
     rightText: string,
-  ): AutoConversionFeatureMatchResult | undefined;
+  ): AutoTransformFeatureMatchResult | undefined;
   compatibilityTester(
     opening: CharacterMetadata[],
     content: CharacterMetadata[],
@@ -41,11 +41,11 @@ export interface AutoConversionFeatureOptions {
   ): boolean;
 }
 
-export function createAutoConversionFeature({
+export function createAutoTransformFeature({
   style,
   matcher,
   compatibilityTester,
-}: AutoConversionFeatureOptions): Feature {
+}: AutoTransformFeatureOptions): Feature {
   return (
     editorState,
     {offset, input, block, blockKey, leftText, rightText},

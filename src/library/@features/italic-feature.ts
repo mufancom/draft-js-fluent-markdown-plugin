@@ -4,7 +4,7 @@ import * as Immutable from 'immutable';
 import {Feature} from '../@feature';
 import {characterListContainsEntity, unescapeMarkdown} from '../@utils';
 
-import {createAutoConversionFeature} from './@auto-conversion-feature';
+import {createAutoTransformFeature} from './@auto-transform-feature';
 
 const ASTERISK_ITALIC_REGEX = /(?:^|[^*])(\*)((?:\\.|(?!\\|\*).)+)(\*)$/;
 const UNDERLINE_ITALIC_REGEX = /(?:^|[^_])(_)((?:\\.|(?!\\|_).)+)(_)$/;
@@ -12,7 +12,7 @@ const UNDERLINE_ITALIC_REGEX = /(?:^|[^_])(_)((?:\\.|(?!\\|_).)+)(_)$/;
 const ITALIC_STYLE: DraftInlineStyle = Immutable.OrderedSet(['ITALIC']);
 
 export function createItalicFeature(): Feature {
-  return createAutoConversionFeature({
+  return createAutoTransformFeature({
     style: ITALIC_STYLE,
     matcher(leftText, input) {
       let leftTextWithInput = leftText + input;

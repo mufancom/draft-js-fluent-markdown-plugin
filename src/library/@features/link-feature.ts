@@ -8,14 +8,14 @@ import {
   unescapeMarkdown,
 } from '../@utils';
 
-import {createAutoConversionFeature} from './@auto-conversion-feature';
+import {createAutoTransformFeature} from './@auto-transform-feature';
 
 const LINK_REGEX = /(?:^|[^!])(\[)((?:\\.|(?!\]).)+)(\]\(((?:\\.|(?![\\)])\S)+?)\))$/;
 
 const LINK_STYLE: DraftInlineStyle = Immutable.OrderedSet(['LINK']);
 
 export function createLinkFeature(): Feature {
-  return createAutoConversionFeature({
+  return createAutoTransformFeature({
     style: LINK_STYLE,
     matcher(leftText, input) {
       let groups = LINK_REGEX.exec(leftText + input);
