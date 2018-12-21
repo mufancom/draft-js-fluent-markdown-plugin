@@ -8,6 +8,7 @@ import {
 import * as Immutable from 'immutable';
 
 import {Feature} from '../@feature';
+import {getContentSelectionAmbient} from '../@utils';
 
 export interface AutoBlockFeatureMatchResult {
   type: string;
@@ -26,7 +27,16 @@ export function createAutoBlockFeature({
   matcher,
   compatibilityTester,
 }: AutoBlockFeatureOptions): Feature {
-  return (editorState, {offset, input, block, blockKey, leftText}) => {
+  return (input, editorState) => {
+    let {
+      content,
+      selection,
+      leftOffset,
+      leftBlock,
+      leftBlockKey,
+      leftText,
+    } = getContentSelectionAmbient(editorState);
+
     let result = matcher(leftText, input);
 
     if (!result) {
@@ -37,7 +47,7 @@ export function createAutoBlockFeature({
 
     let currentInlineStyle = editorState.getCurrentInlineStyle();
 
-    let characterList = block.getCharacterList().toArray();
+    let characterList = leftBlock.getCharacterList().toArray();
 
     let inputCharacterList = new Array<CharacterMetadata>(input.length).fill(
       CharacterMetadata.create({
@@ -46,16 +56,13 @@ export function createAutoBlockFeature({
     );
 
     let leftCharacterList = [
-      ...characterList.slice(0, offset),
+      ...characterList.slice(0, leftOffset),
       ...inputCharacterList,
     ];
 
     if (!compatibilityTester(leftCharacterList)) {
       return undefined;
     }
-
-    let content = editorState.getCurrentContent();
-    let selection = editorState.getSelection();
 
     ////////////////////
     // PHASE 1: INPUT //
@@ -74,11 +81,11 @@ export function createAutoBlockFeature({
     // PHASE 2: SET BLOCK TYPE //
     /////////////////////////////
 
-    let blockRange = SelectionState.createEmpty(blockKey);
+    let blockRange = SelectionState.createEmpty(leftBlockKey);
 
     let leftRange = blockRange.merge({
       anchorOffset: 0,
-      focusOffset: offset + input.length,
+      focusOffset: leftOffset + input.length,
     }) as SelectionState;
 
     content = Modifier.removeRange(content, leftRange, 'backward');

@@ -3,7 +3,58 @@ import {
   ContentBlock,
   ContentState,
   DraftEntityInstance,
+  EditorState,
+  SelectionState,
 } from 'draft-js';
+
+export interface ContentSelectionAmbient {
+  content: ContentState;
+  selection: SelectionState;
+  leftOffset: number;
+  leftBlockKey: string;
+  leftBlock: ContentBlock;
+  leftText: string;
+  rightOffset: number;
+  rightBlockKey: string;
+  rightBlock: ContentBlock;
+  rightText: string;
+}
+
+export function getContentSelectionAmbient(
+  editorState: EditorState,
+): ContentSelectionAmbient {
+  let selection = editorState.getSelection();
+  let content = editorState.getCurrentContent();
+
+  let leftBlockKey = selection.getStartKey();
+  let leftBlock = content.getBlockForKey(leftBlockKey);
+
+  let leftBlockText = leftBlock.getText();
+  let leftOffset = selection.getStartOffset();
+
+  let leftText = leftBlockText.slice(0, leftOffset);
+
+  let rightBlockKey = selection.getEndKey();
+  let rightBlock = content.getBlockForKey(rightBlockKey);
+
+  let rightBlockText = rightBlock.getText();
+  let rightOffset = selection.getEndOffset();
+
+  let rightText = rightBlockText.slice(rightOffset);
+
+  return {
+    content,
+    selection,
+    leftOffset,
+    leftBlockKey,
+    leftBlock,
+    leftText,
+    rightOffset,
+    rightBlockKey,
+    rightBlock,
+    rightText,
+  };
+}
 
 export function setBlockDepth(
   content: ContentState,

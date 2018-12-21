@@ -9,7 +9,10 @@ import {
 } from 'draft-js';
 
 import {Feature} from '../@feature';
-import {testCharacterListConsistency} from '../@utils';
+import {
+  getContentSelectionAmbient,
+  testCharacterListConsistency,
+} from '../@utils';
 
 export interface AutoTransformFeatureMatchEntityDescriptor {
   type: string;
@@ -46,10 +49,17 @@ export function createAutoTransformFeature({
   matcher,
   compatibilityTester,
 }: AutoTransformFeatureOptions): Feature {
-  return (
-    editorState,
-    {offset, input, block, blockKey, leftText, rightText},
-  ) => {
+  return (input, editorState) => {
+    let {
+      content,
+      selection,
+      leftOffset,
+      leftBlock,
+      leftBlockKey,
+      leftText,
+      rightText,
+    } = getContentSelectionAmbient(editorState);
+
     let result = matcher(leftText, input, rightText);
 
     if (!result) {
@@ -118,12 +128,12 @@ export function createAutoTransformFeature({
 
     let currentInlineStyle = editorState.getCurrentInlineStyle();
 
-    let sourceStartOffset = offset - (markdown.length - input.length);
+    let sourceStartOffset = leftOffset - (markdown.length - input.length);
     let contentSourceStartOffset = sourceStartOffset + opening.length;
-    let contentSourceEndOffset = offset - (closing.length - input.length);
-    let sourceEndOffset = offset;
+    let contentSourceEndOffset = leftOffset - (closing.length - input.length);
+    let sourceEndOffset = leftOffset;
 
-    let characterList = block.getCharacterList().toArray();
+    let leftCharacterList = leftBlock.getCharacterList().toArray();
 
     let inputCharacterList = new Array<CharacterMetadata>(input.length).fill(
       CharacterMetadata.create({
@@ -131,16 +141,16 @@ export function createAutoTransformFeature({
       }),
     );
 
-    let openingCharacterList = characterList.slice(
+    let openingCharacterList = leftCharacterList.slice(
       sourceStartOffset,
       contentSourceStartOffset,
     );
-    let contentCharacterList = characterList.slice(
+    let contentCharacterList = leftCharacterList.slice(
       contentSourceStartOffset,
       contentSourceEndOffset,
     );
     let closingCharacterList = [
-      ...characterList.slice(contentSourceEndOffset, sourceEndOffset),
+      ...leftCharacterList.slice(contentSourceEndOffset, sourceEndOffset),
       ...inputCharacterList,
     ];
 
@@ -154,21 +164,19 @@ export function createAutoTransformFeature({
       return undefined;
     }
 
-    let selection = editorState.getSelection();
     let finalSelectionAfter: SelectionState | undefined;
-
-    let content = editorState.getCurrentContent();
 
     ////////////////////
     // PHASE 1: INPUT //
     ////////////////////
 
-    let slippingCharacterList = characterList.slice(
+    let slippingCharacterList = leftCharacterList.slice(
       sourceEndOffset,
       sourceEndOffset + input.length,
     );
 
     if (
+      selection.isCollapsed() &&
       rightText.startsWith(input) &&
       testCharacterListConsistency([
         ...inputCharacterList,
@@ -228,7 +236,7 @@ export function createAutoTransformFeature({
       // [...][opening][content][closing-without-input][input][...]
       //      └ source start                           └ source end
 
-      let sourceRange = SelectionState.createEmpty(blockKey).merge({
+      let sourceRange = SelectionState.createEmpty(leftBlockKey).merge({
         anchorOffset: sourceStartOffset,
         focusOffset: sourceEndOffset + input.length,
       }) as SelectionState;
@@ -253,16 +261,16 @@ export function createAutoTransformFeature({
         // [...][zero-width-character][...]
         //      └ source start
 
-        let sourceStart = SelectionState.createEmpty(blockKey).merge({
+        let sourceStart = SelectionState.createEmpty(leftBlockKey).merge({
           anchorOffset: sourceStartOffset,
           focusOffset: sourceStartOffset,
         }) as SelectionState;
 
         content = Modifier.splitBlock(content, sourceStart);
 
-        atomicBlockKey = content.getKeyAfter(blockKey);
+        atomicBlockKey = content.getKeyAfter(leftBlockKey);
       } else {
-        atomicBlockKey = blockKey;
+        atomicBlockKey = leftBlockKey;
       }
 
       // 3. if the next block is not empty, split it to create an empty one.
@@ -307,7 +315,7 @@ export function createAutoTransformFeature({
 
       content = Modifier.setBlockType(content, atomicBlockRange, 'atomic');
     } else {
-      let blockWithInput = content.getBlockForKey(blockKey);
+      let blockWithInput = content.getBlockForKey(leftBlockKey);
 
       // replace the markdown one fragment by another to preserve character
       // styles.
@@ -315,7 +323,7 @@ export function createAutoTransformFeature({
         ([content, sourceOffset, outputOffset], source, index) => {
           let unescaped = textFragments[index];
 
-          let range = SelectionState.createEmpty(blockKey).merge({
+          let range = SelectionState.createEmpty(leftBlockKey).merge({
             anchorOffset: outputOffset,
             focusOffset: outputOffset + source.length,
           }) as SelectionState;
@@ -343,7 +351,7 @@ export function createAutoTransformFeature({
 
       finalSelectionAfter = content.getSelectionAfter();
 
-      let entityRange = SelectionState.createEmpty(blockKey).merge({
+      let entityRange = SelectionState.createEmpty(leftBlockKey).merge({
         anchorOffset: sourceStartOffset,
         focusOffset: sourceStartOffset + text.length,
       }) as SelectionState;

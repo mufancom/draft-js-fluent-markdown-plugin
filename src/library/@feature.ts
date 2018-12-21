@@ -1,15 +1,6 @@
-import {ContentBlock, EditorState} from 'draft-js';
-
-export interface FeatureOptions {
-  offset: number;
-  input: string;
-  block: ContentBlock;
-  blockKey: string;
-  leftText: string;
-  rightText: string;
-}
+import {EditorState} from 'draft-js';
 
 export type Feature = (
+  input: string,
   editorState: EditorState,
-  options: FeatureOptions,
 ) => EditorState | undefined;

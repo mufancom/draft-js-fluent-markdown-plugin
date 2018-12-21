@@ -19,7 +19,7 @@ import {
   createCodeDecorator,
   createLinkDecorator,
 } from './@decorators';
-import {Feature, FeatureOptions} from './@feature';
+import {Feature} from './@feature';
 import {
   createBlockquoteFeature,
   createBoldFeature,
@@ -125,7 +125,7 @@ export class FluentMarkdownPlugin {
   ): DraftHandleValue => {
     let nextEditorState = this.triggerFeature(input, editorState);
 
-    if (nextEditorState) {
+    if (nextEditorState !== editorState) {
       setEditorState(nextEditorState);
       return 'handled';
     } else {
@@ -152,39 +152,16 @@ export class FluentMarkdownPlugin {
     return handleInlineStyleOverriding(editorState);
   };
 
-  private triggerFeature(
-    input: string,
-    editorState: EditorState,
-  ): EditorState | undefined {
-    let selection = editorState.getSelection();
-    let content = editorState.getCurrentContent();
-
-    let blockKey = selection.getStartKey();
-    let block = content.getBlockForKey(blockKey);
-
-    let blockText = block.getText();
-    let offset = selection.getStartOffset();
-    let leftText = blockText.slice(0, offset);
-    let rightText = blockText.slice(offset);
-
-    let options: FeatureOptions = {
-      input,
-      offset,
-      block,
-      blockKey,
-      leftText,
-      rightText,
-    };
-
+  private triggerFeature(input: string, editorState: EditorState): EditorState {
     for (let feature of this.features) {
-      let nextEditorState = feature(editorState, options);
+      let nextEditorState = feature(input, editorState);
 
       if (nextEditorState) {
         return nextEditorState;
       }
     }
 
-    return undefined;
+    return editorState;
   }
 }
 
