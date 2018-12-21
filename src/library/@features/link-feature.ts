@@ -33,7 +33,6 @@ export function createLinkFeature(): Feature {
       let {text: href} = unescapeMarkdown(hrefMarkdownSource);
 
       return {
-        type: 'match',
         opening,
         closing,
         markdownFragments,

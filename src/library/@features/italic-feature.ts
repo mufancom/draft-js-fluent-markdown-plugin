@@ -30,7 +30,6 @@ export function createItalicFeature(): Feature {
       let {markdownFragments, textFragments} = unescapeMarkdown(markdownSource);
 
       return {
-        type: 'match',
         opening,
         closing,
         markdownFragments,

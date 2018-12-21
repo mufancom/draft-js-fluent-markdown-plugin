@@ -31,7 +31,7 @@ export function createStrikethroughFeature(): Feature {
       let {markdownFragments, textFragments} = unescapeMarkdown(markdownSource);
 
       return {
-        type: closing.length === 2 ? 'match' : 'pre-match',
+        preMatch: closing.length < 2,
         opening,
         closing,
         markdownFragments,

@@ -29,7 +29,6 @@ export function createCodeFeature(): Feature {
       let {markdownFragments, textFragments} = unescapeMarkdown(markdownSource);
 
       return {
-        type: 'match',
         opening,
         closing,
         markdownFragments,

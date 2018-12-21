@@ -34,7 +34,6 @@ export function createImageFeature(): Feature {
       let data: ImageEntityData = {alt, src};
 
       return {
-        type: 'match',
         opening,
         closing,
         markdownFragments: [markdown],

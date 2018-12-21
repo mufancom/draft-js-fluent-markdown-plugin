@@ -17,6 +17,7 @@ import {Feature, FeatureOptions} from './@feature';
 import {
   createBoldFeature,
   createCodeFeature,
+  createHeaderFeature,
   createImageFeature,
   createItalicFeature,
   createLinkFeature,
@@ -57,7 +58,7 @@ export class FluentMarkdownPlugin {
     if (block) {
       atomicComponentEntries.push(createImageAtomicComponentEntry());
 
-      features.push(createImageFeature());
+      features.push(createImageFeature(), createHeaderFeature());
     }
 
     this.atomicDescriptorMap = new Map(atomicComponentEntries);

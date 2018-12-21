@@ -18,7 +18,7 @@ export interface AutoTransformFeatureMatchEntityDescriptor {
 }
 
 export interface AutoTransformFeatureMatchResult {
-  type: 'pre-match' | 'match';
+  preMatch?: boolean;
   opening: string;
   closing: string;
   markdownFragments: string[];
@@ -57,7 +57,7 @@ export function createAutoTransformFeature({
     }
 
     let {
-      type,
+      preMatch,
       opening,
       closing,
       markdownFragments,
@@ -123,13 +123,13 @@ export function createAutoTransformFeature({
     let contentSourceEndOffset = offset - (closing.length - input.length);
     let sourceEndOffset = offset;
 
+    let characterList = block.getCharacterList().toArray();
+
     let inputCharacterList = new Array<CharacterMetadata>(input.length).fill(
       CharacterMetadata.create({
         style: currentInlineStyle,
       }),
     );
-
-    let characterList = block.getCharacterList().toArray();
 
     let openingCharacterList = characterList.slice(
       sourceStartOffset,
@@ -184,7 +184,7 @@ export function createAutoTransformFeature({
         focusOffset: nextOffset,
       }) as SelectionState;
 
-      if (type === 'pre-match') {
+      if (preMatch) {
         editorState = EditorState.forceSelection(editorState, selectionAfter);
       }
     } else {
@@ -198,7 +198,7 @@ export function createAutoTransformFeature({
       editorState = EditorState.push(editorState, content, 'insert-characters');
     }
 
-    if (type === 'pre-match') {
+    if (preMatch) {
       return editorState;
     }
 
