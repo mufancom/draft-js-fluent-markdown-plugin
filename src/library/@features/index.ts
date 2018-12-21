@@ -6,3 +6,5 @@ export * from './link-feature';
 export * from './image-feature';
 export * from './header-feature';
 export * from './list-feature';
+export * from './blockquote-feature';
+export * from './code-block-feature';

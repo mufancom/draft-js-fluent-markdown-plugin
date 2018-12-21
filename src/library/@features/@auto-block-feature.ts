@@ -8,7 +8,6 @@ import {
 import * as Immutable from 'immutable';
 
 import {Feature} from '../@feature';
-import {setBlockDepth} from '../@utils';
 
 export interface AutoBlockFeatureMatchResult {
   type: string;
@@ -62,7 +61,7 @@ export function createAutoBlockFeature({
     // PHASE 1: INPUT //
     ////////////////////
 
-    content = Modifier.insertText(
+    content = Modifier.replaceText(
       content,
       selection,
       input,
@@ -86,7 +85,6 @@ export function createAutoBlockFeature({
 
     content = Modifier.setBlockType(content, blockRange, type);
     content = Modifier.setBlockData(content, blockRange, Immutable.Map(data));
-    content = setBlockDepth(content, blockKey, 0);
 
     content = content.merge({
       selectionAfter: blockRange.merge({hasFocus: true}),

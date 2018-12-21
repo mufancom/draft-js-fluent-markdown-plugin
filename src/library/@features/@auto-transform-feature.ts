@@ -188,7 +188,7 @@ export function createAutoTransformFeature({
         editorState = EditorState.forceSelection(editorState, selectionAfter);
       }
     } else {
-      content = Modifier.insertText(
+      content = Modifier.replaceText(
         content,
         selection,
         input,

@@ -11,13 +11,19 @@ import {KeyboardEvent} from 'react';
 import {AtomicDescriptor, AtomicDescriptorEntry} from './@atomic';
 import {createImageAtomicComponentEntry} from './@atomics';
 import {
+  handleInlineStyleOverriding,
+  handleMultilineBlockReturn,
+} from './@behaviors';
+import {
   LinkDecoratorOptions,
   createCodeDecorator,
   createLinkDecorator,
 } from './@decorators';
 import {Feature, FeatureOptions} from './@feature';
 import {
+  createBlockquoteFeature,
   createBoldFeature,
+  createCodeBlockFeature,
   createCodeFeature,
   createHeaderFeature,
   createImageFeature,
@@ -26,7 +32,7 @@ import {
   createListFeature,
   createStrikethroughFeature,
 } from './@features';
-import {getBlockEntityTypeAt, handleInlineStyleOverriding} from './@utils';
+import {getBlockEntityTypeAt} from './@utils';
 
 export interface FluentMarkdownPluginLinkOptions extends LinkDecoratorOptions {}
 
@@ -65,6 +71,8 @@ export class FluentMarkdownPlugin {
         createImageFeature(),
         createHeaderFeature(),
         createListFeature(),
+        createBlockquoteFeature(),
+        createCodeBlockFeature(),
       );
     }
 
@@ -115,9 +123,24 @@ export class FluentMarkdownPlugin {
     editorState: EditorState,
     {setEditorState}: EditorPluginFunctions,
   ): DraftHandleValue => {
-    let nextEditorState = this.triggerFeature(editorState, input);
+    let nextEditorState = this.triggerFeature(input, editorState);
 
     if (nextEditorState) {
+      setEditorState(nextEditorState);
+      return 'handled';
+    } else {
+      return 'not-handled';
+    }
+  };
+
+  handleReturn = (
+    event: KeyboardEvent,
+    editorState: EditorState,
+    {setEditorState}: EditorPluginFunctions,
+  ): DraftHandleValue => {
+    let nextEditorState = handleMultilineBlockReturn(event, editorState);
+
+    if (nextEditorState !== editorState) {
       setEditorState(nextEditorState);
       return 'handled';
     } else {
@@ -130,8 +153,8 @@ export class FluentMarkdownPlugin {
   };
 
   private triggerFeature(
-    editorState: EditorState,
     input: string,
+    editorState: EditorState,
   ): EditorState | undefined {
     let selection = editorState.getSelection();
     let content = editorState.getCurrentContent();
