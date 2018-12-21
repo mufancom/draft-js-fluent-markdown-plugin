@@ -1,6 +1,7 @@
 import {
   ContentBlock,
   DraftDecorator,
+  DraftEditorCommand,
   DraftHandleValue,
   EditorState,
   RichUtils,
@@ -11,6 +12,7 @@ import {KeyboardEvent} from 'react';
 import {AtomicDescriptor, AtomicDescriptorEntry} from './@atomic';
 import {createImageAtomicComponentEntry} from './@atomics';
 import {
+  handleBlockSplitting,
   handleInlineStyleOverriding,
   handleMultilineBlockReturn,
 } from './@behaviors';
@@ -141,6 +143,27 @@ export class FluentMarkdownPlugin {
     let nextEditorState = handleMultilineBlockReturn(event, editorState);
 
     if (nextEditorState !== editorState) {
+      setEditorState(nextEditorState);
+      return 'handled';
+    } else {
+      return 'not-handled';
+    }
+  };
+
+  handleKeyCommand = (
+    command: DraftEditorCommand,
+    editorState: EditorState,
+    {setEditorState}: EditorPluginFunctions,
+  ): DraftHandleValue => {
+    let nextEditorState: EditorState | undefined;
+
+    switch (command) {
+      case 'split-block':
+        nextEditorState = handleBlockSplitting(editorState);
+        break;
+    }
+
+    if (nextEditorState && nextEditorState !== editorState) {
       setEditorState(nextEditorState);
       return 'handled';
     } else {
