@@ -1,0 +1,29 @@
+body {
+  font-family: sans-serif;
+}
+
+.DraftEditor-editorContainer [data-contents='true'] > pre > pre {
+  padding: 10px;
+  background-color: #eee;
+}
+
+.DraftEditor-editorContainer [data-contents='true'] > blockquote {
+  margin: 10px;
+  padding: 5px 10px;
+  border-left: solid 4px #eee;
+}
+
+.DraftEditor-editorContainer [data-contents='true'] code {
+  padding: 0 4px;
+  border-radius: 4px;
+  background-color: #eee;
+}
+
+.DraftEditor-editorContainer [data-contents='true'] a {
+  color: #296dff;
+  text-decoration: none;
+}
+
+.DraftEditor-editorContainer [data-contents='true'] a:hover {
+  text-decoration: underline;
+}

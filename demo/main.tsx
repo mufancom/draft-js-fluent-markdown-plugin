@@ -7,6 +7,8 @@ import ReactDOM from 'react-dom';
 
 import createFluentMarkdownPlugin from '../bld/library';
 
+import './style.css';
+
 const PLUGINS = [createFluentMarkdownPlugin()];
 
 interface AppProps {}
