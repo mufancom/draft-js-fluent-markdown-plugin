@@ -14,10 +14,12 @@ const ITALIC_STYLE: DraftInlineStyle = Immutable.OrderedSet(['ITALIC']);
 export function createItalicFeature(): Feature {
   return createAutoConversionFeature({
     style: ITALIC_STYLE,
-    matcher(textBeforeOffset) {
+    matcher(leftText, input) {
+      let leftTextWithInput = leftText + input;
+
       let groups =
-        ASTERISK_ITALIC_REGEX.exec(textBeforeOffset) ||
-        UNDERLINE_ITALIC_REGEX.exec(textBeforeOffset);
+        ASTERISK_ITALIC_REGEX.exec(leftTextWithInput) ||
+        UNDERLINE_ITALIC_REGEX.exec(leftTextWithInput);
 
       if (!groups) {
         return undefined;
@@ -28,6 +30,7 @@ export function createItalicFeature(): Feature {
       let {markdownFragments, textFragments} = unescapeMarkdown(markdownSource);
 
       return {
+        type: 'match',
         opening,
         closing,
         markdownFragments,

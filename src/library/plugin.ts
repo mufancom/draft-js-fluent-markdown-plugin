@@ -13,7 +13,7 @@ import {
   createCodeDecorator,
   createLinkDecorator,
 } from './@decorators';
-import {Feature, FeatureOptions, FeatureTrigger} from './@feature';
+import {Feature, FeatureOptions} from './@feature';
 import {
   createBoldFeature,
   createCodeFeature,
@@ -22,11 +22,7 @@ import {
   createLinkFeature,
   createStrikethroughFeature,
 } from './@features';
-import {
-  getBlockEntityTypeAt,
-  handleInlineStyleOverriding,
-  splitBlockAndPush,
-} from './@utils';
+import {getBlockEntityTypeAt, handleInlineStyleOverriding} from './@utils';
 
 export interface FluentMarkdownPluginLinkOptions extends LinkDecoratorOptions {}
 
@@ -95,33 +91,7 @@ export class FluentMarkdownPlugin {
     editorState: EditorState,
     {setEditorState}: EditorPluginFunctions,
   ): DraftHandleValue => {
-    let nextEditorState = this.triggerFeature(editorState, {input});
-
-    if (nextEditorState) {
-      setEditorState(nextEditorState);
-      return 'handled';
-    } else {
-      return 'not-handled';
-    }
-  };
-
-  handleKeyCommand = (
-    command: string,
-    editorState: EditorState,
-    {setEditorState}: EditorPluginFunctions,
-  ): DraftHandleValue => {
-    let nextEditorState: EditorState | undefined;
-
-    switch (command) {
-      case 'split-block':
-        nextEditorState = this.triggerFeature(editorState, {command});
-
-        if (!nextEditorState) {
-          nextEditorState = splitBlockAndPush(editorState);
-        }
-
-        break;
-    }
+    let nextEditorState = this.triggerFeature(editorState, input);
 
     if (nextEditorState) {
       setEditorState(nextEditorState);
@@ -137,7 +107,7 @@ export class FluentMarkdownPlugin {
 
   private triggerFeature(
     editorState: EditorState,
-    trigger: FeatureTrigger,
+    input: string,
   ): EditorState | undefined {
     let selection = editorState.getSelection();
     let content = editorState.getCurrentContent();
@@ -147,22 +117,22 @@ export class FluentMarkdownPlugin {
 
     let blockText = block.getText();
     let offset = selection.getStartOffset();
-    let blockTextBeforeOffset = blockText.slice(0, offset);
-    let blockTextAfterOffset = blockText.slice(offset);
+    let leftText = blockText.slice(0, offset);
+    let rightText = blockText.slice(offset);
 
     let options: FeatureOptions = {
-      trigger,
+      input,
       offset,
       block,
       blockKey,
-      blockTextBeforeOffset,
-      blockTextAfterOffset,
+      leftText,
+      rightText,
     };
 
     for (let feature of this.features) {
       let nextEditorState = feature(editorState, options);
 
-      if (nextEditorState !== editorState) {
+      if (nextEditorState) {
         return nextEditorState;
       }
     }

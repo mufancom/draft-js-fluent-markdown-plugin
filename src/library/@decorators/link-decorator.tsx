@@ -49,7 +49,7 @@ export function createLinkDecorator({
         },
       );
 
-      let characters = block.getText().split('');
+      let characters = Array.from(block.getText());
 
       for (let [start, end] of entityRanges) {
         let length = end - start;

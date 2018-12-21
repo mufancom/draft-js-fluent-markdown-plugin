@@ -17,8 +17,8 @@ const CODE_STYLE: DraftInlineStyle = Immutable.OrderedSet(['CODE']);
 export function createCodeFeature(): Feature {
   return createAutoConversionFeature({
     style: CODE_STYLE,
-    matcher(textBeforeOffset) {
-      let groups = CODE_REGEX.exec(textBeforeOffset);
+    matcher(leftText, input) {
+      let groups = CODE_REGEX.exec(leftText + input);
 
       if (!groups) {
         return undefined;
@@ -29,6 +29,7 @@ export function createCodeFeature(): Feature {
       let {markdownFragments, textFragments} = unescapeMarkdown(markdownSource);
 
       return {
+        type: 'match',
         opening,
         closing,
         markdownFragments,

@@ -17,8 +17,8 @@ const LINK_STYLE: DraftInlineStyle = Immutable.OrderedSet(['LINK']);
 export function createLinkFeature(): Feature {
   return createAutoConversionFeature({
     style: LINK_STYLE,
-    matcher(textBeforeOffset) {
-      let groups = LINK_REGEX.exec(textBeforeOffset);
+    matcher(leftText, input) {
+      let groups = LINK_REGEX.exec(leftText + input);
 
       if (!groups) {
         return undefined;
@@ -33,6 +33,7 @@ export function createLinkFeature(): Feature {
       let {text: href} = unescapeMarkdown(hrefMarkdownSource);
 
       return {
+        type: 'match',
         opening,
         closing,
         markdownFragments,

@@ -11,15 +11,15 @@ import {
 
 import {createAutoConversionFeature} from './@auto-conversion-feature';
 
-const IMAGE_REGEX = /(!\[)((?:\\.|(?!\]).)+)(\]\(((?:\\.|(?![\\)])\S)+?)\))$/;
+const IMAGE_REGEX = /(!\[)((?:\\.|(?!\]).)*)(\]\(((?:\\.|(?![\\)])\S)+?)\))$/;
 
 const IMAGE_STYLE: DraftInlineStyle = Immutable.OrderedSet();
 
 export function createImageFeature(): Feature {
   return createAutoConversionFeature({
     style: IMAGE_STYLE,
-    matcher(textBeforeOffset) {
-      let groups = IMAGE_REGEX.exec(textBeforeOffset);
+    matcher(leftText, input) {
+      let groups = IMAGE_REGEX.exec(leftText + input);
 
       if (!groups) {
         return undefined;
@@ -34,6 +34,7 @@ export function createImageFeature(): Feature {
       let data: ImageEntityData = {alt, src};
 
       return {
+        type: 'match',
         opening,
         closing,
         markdownFragments: [markdown],

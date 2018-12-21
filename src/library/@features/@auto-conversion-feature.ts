@@ -1,6 +1,5 @@
 import {
   CharacterMetadata,
-  ContentBlock,
   ContentState,
   DraftEntityMutability,
   DraftInlineStyle,
@@ -10,6 +9,7 @@ import {
 } from 'draft-js';
 
 import {Feature} from '../@feature';
+import {testCharacterListConsistency} from '../@utils';
 
 export interface AutoConversionFeatureMatchEntityDescriptor {
   type: string;
@@ -18,6 +18,7 @@ export interface AutoConversionFeatureMatchEntityDescriptor {
 }
 
 export interface AutoConversionFeatureMatchResult {
+  type: 'pre-match' | 'match';
   opening: string;
   closing: string;
   markdownFragments: string[];
@@ -29,8 +30,9 @@ export interface AutoConversionFeatureMatchResult {
 export interface AutoConversionFeatureOptions {
   style: DraftInlineStyle;
   matcher(
-    blockTextBeforeOffset: string,
-    blockTextAfterOffset: string,
+    leftText: string,
+    input: string,
+    rightText: string,
   ): AutoConversionFeatureMatchResult | undefined;
   compatibilityTester(
     opening: CharacterMetadata[],
@@ -46,22 +48,16 @@ export function createAutoConversionFeature({
 }: AutoConversionFeatureOptions): Feature {
   return (
     editorState,
-    {
-      trigger: {input = '', command},
-      offset,
-      block,
-      blockKey,
-      blockTextBeforeOffset,
-      blockTextAfterOffset,
-    },
+    {offset, input, block, blockKey, leftText, rightText},
   ) => {
-    let result = matcher(blockTextBeforeOffset, blockTextAfterOffset);
+    let result = matcher(leftText, input, rightText);
 
     if (!result) {
-      return editorState;
+      return undefined;
     }
 
     let {
+      type,
       opening,
       closing,
       markdownFragments,
@@ -72,19 +68,19 @@ export function createAutoConversionFeature({
 
     if (!Array.isArray(markdownFragments)) {
       throw new Error(
-        'Expecting `markdown` property of matcher result to be an array',
+        'Expecting `markdownFragments` property of matcher result to be an array',
       );
     }
 
     if (!Array.isArray(textFragments)) {
       throw new Error(
-        'Expecting `text` property of matcher result to be an array',
+        'Expecting `textFragments` property of matcher result to be an array',
       );
     }
 
     if (markdownFragments.length !== textFragments.length) {
       throw new Error(
-        'Expecting `markdown` and `text` property of matcher result to have the same length',
+        'Expecting `markdownFragments` and `textFragments` property of matcher result to have the same length',
       );
     }
 
@@ -99,23 +95,54 @@ export function createAutoConversionFeature({
     }
 
     let markdown = markdownFragments.join('');
+
+    if (!(leftText + input).endsWith(markdown)) {
+      throw new Error('Invalid matched markdown');
+    }
+
     let text = textFragments.join('');
 
-    let offsetBeforeMarkdown = offset - markdown.length;
-    let offsetAfterOpening = offsetBeforeMarkdown + opening.length;
-    let offsetBeforeClosing = offset - closing.length;
+    // block:
+    // [...][opening][content][closing-without-input][...]
+    //      └ source │        └ content source end   └ source end
+    //        start  └ content source start
+    //
+    // matched markdown:
+    // [opening][content][closing-without-input][input]
+    //
+    // length from opening to closing without input:
+    //   = markdown.length - input.length
+    //
+    // length of closing without input:
+    //   = closing.length - input.length
+
+    let currentInlineStyle = editorState.getCurrentInlineStyle();
+
+    let sourceStartOffset = offset - (markdown.length - input.length);
+    let contentSourceStartOffset = sourceStartOffset + opening.length;
+    let contentSourceEndOffset = offset - (closing.length - input.length);
+    let sourceEndOffset = offset;
+
+    let inputCharacterList = new Array<CharacterMetadata>(input.length).fill(
+      CharacterMetadata.create({
+        style: currentInlineStyle,
+      }),
+    );
 
     let characterList = block.getCharacterList().toArray();
 
     let openingCharacterList = characterList.slice(
-      offsetBeforeMarkdown,
-      offsetAfterOpening,
+      sourceStartOffset,
+      contentSourceStartOffset,
     );
     let contentCharacterList = characterList.slice(
-      offsetAfterOpening,
-      offsetBeforeClosing,
+      contentSourceStartOffset,
+      contentSourceEndOffset,
     );
-    let closingCharacterList = characterList.slice(offsetBeforeClosing, offset);
+    let closingCharacterList = [
+      ...characterList.slice(contentSourceEndOffset, sourceEndOffset),
+      ...inputCharacterList,
+    ];
 
     if (
       !compatibilityTester(
@@ -124,11 +151,11 @@ export function createAutoConversionFeature({
         closingCharacterList,
       )
     ) {
-      return editorState;
+      return undefined;
     }
 
-    let initialSelection = editorState.getSelection();
-    let finalSelection: SelectionState | undefined;
+    let selection = editorState.getSelection();
+    let finalSelectionAfter: SelectionState | undefined;
 
     let content = editorState.getCurrentContent();
 
@@ -136,28 +163,42 @@ export function createAutoConversionFeature({
     // PHASE 1: INPUT //
     ////////////////////
 
-    if (input) {
-      if (input !== blockTextAfterOffset[0]) {
-        content = Modifier.insertText(
-          content,
-          initialSelection,
-          input,
-          block.getInlineStyleAt(offset),
-        );
+    let slippingCharacterList = characterList.slice(
+      sourceEndOffset,
+      sourceEndOffset + input.length,
+    );
 
-        editorState = EditorState.push(
-          editorState,
-          content,
-          'insert-characters',
-        );
+    if (
+      rightText.startsWith(input) &&
+      testCharacterListConsistency([
+        ...inputCharacterList,
+        ...slippingCharacterList,
+      ])
+    ) {
+      // slip over matching sibling text
+
+      let nextOffset = sourceEndOffset + input.length;
+
+      let selectionAfter = selection.merge({
+        anchorOffset: nextOffset,
+        focusOffset: nextOffset,
+      }) as SelectionState;
+
+      if (type === 'pre-match') {
+        editorState = EditorState.forceSelection(editorState, selectionAfter);
       }
-    } else if (command === 'split-block') {
-      content = Modifier.splitBlock(content, initialSelection);
-
-      finalSelection = content.getSelectionAfter();
-
-      editorState = EditorState.push(editorState, content, 'split-block');
     } else {
+      content = Modifier.insertText(
+        content,
+        selection,
+        input,
+        currentInlineStyle,
+      );
+
+      editorState = EditorState.push(editorState, content, 'insert-characters');
+    }
+
+    if (type === 'pre-match') {
       return editorState;
     }
 
@@ -165,7 +206,6 @@ export function createAutoConversionFeature({
     // PHASE 2: TRANSFORM //
     ////////////////////////
 
-    let finalSelectionAfter: SelectionState;
     let entityKey: string | undefined;
 
     if (entityDescriptor) {
@@ -183,9 +223,14 @@ export function createAutoConversionFeature({
 
       // 1. replace image markdown with zero-width character.
 
+      // current content state:
+      //      ┌──────────────── to be replaced ──────────────┐
+      // [...][opening][content][closing-without-input][input][...]
+      //      └ source start                           └ source end
+
       let sourceRange = SelectionState.createEmpty(blockKey).merge({
-        anchorOffset: offsetBeforeMarkdown,
-        focusOffset: offset,
+        anchorOffset: sourceStartOffset,
+        focusOffset: sourceEndOffset + input.length,
       }) as SelectionState;
 
       let character = '\u200b';
@@ -201,12 +246,16 @@ export function createAutoConversionFeature({
       // 2. if it's not at the beginning of the block, split it.
 
       let atomicBlockKey: string;
-      let atomicBlock: ContentBlock;
 
-      if (offsetBeforeMarkdown > 0) {
+      if (sourceStartOffset > 0) {
+        // current content state:
+        //      ┌ to be split
+        // [...][zero-width-character][...]
+        //      └ source start
+
         let sourceStart = SelectionState.createEmpty(blockKey).merge({
-          anchorOffset: offsetBeforeMarkdown,
-          focusOffset: offsetBeforeMarkdown,
+          anchorOffset: sourceStartOffset,
+          focusOffset: sourceStartOffset,
         }) as SelectionState;
 
         content = Modifier.splitBlock(content, sourceStart);
@@ -216,24 +265,40 @@ export function createAutoConversionFeature({
         atomicBlockKey = blockKey;
       }
 
-      // 3. if there are extra characters after the atomic content, split it.
+      // 3. if the next block is not empty, split it to create an empty one.
 
-      atomicBlock = content.getBlockForKey(atomicBlockKey);
+      let nextBlockKey = content.getKeyAfter(atomicBlockKey);
+      let nextBlock = content.getBlockForKey(nextBlockKey);
 
-      if (character.length < atomicBlock.getLength()) {
+      if (!nextBlock || nextBlock.getLength()) {
+        // current content state:
+        //                       ┌ to be split
+        // [zero-width-character][...]
+
         let atomicBlockEnd = SelectionState.createEmpty(atomicBlockKey).merge({
           anchorOffset: character.length,
           focusOffset: character.length,
         }) as SelectionState;
 
         content = Modifier.splitBlock(content, atomicBlockEnd);
+
+        finalSelectionAfter = content.getSelectionAfter();
+      } else {
+        finalSelectionAfter = SelectionState.createEmpty(nextBlockKey);
       }
 
-      // 4. and now it's a good time to record selection range.
+      // 4. and ↑ is a good time to record selection range.
 
-      finalSelectionAfter = content.getSelectionAfter();
+      // current content state:
+      // #1 [zero-width-character]
+      // #2 [...]
+      //    └ selection after
 
       // 5. transform the block to atomic block.
+
+      // current content state:
+      // ┌── to be set type ──┐
+      // [zero-width-character]
 
       let atomicBlockRange = SelectionState.createEmpty(atomicBlockKey).merge({
         anchorOffset: 0,
@@ -242,19 +307,24 @@ export function createAutoConversionFeature({
 
       content = Modifier.setBlockType(content, atomicBlockRange, 'atomic');
     } else {
+      let blockWithInput = content.getBlockForKey(blockKey);
+
       // replace the markdown one fragment by another to preserve character
       // styles.
       [content] = markdownFragments.reduce<[ContentState, number, number]>(
-        ([content, sourceOffset, offset], source, index) => {
+        ([content, sourceOffset, outputOffset], source, index) => {
           let unescaped = textFragments[index];
 
           let range = SelectionState.createEmpty(blockKey).merge({
-            anchorOffset: offset,
-            focusOffset: offset + source.length,
+            anchorOffset: outputOffset,
+            focusOffset: outputOffset + source.length,
           }) as SelectionState;
 
-          let mergedStyle = block.getInlineStyleAt(sourceOffset).merge(style);
-          let entityKey = block.getEntityAt(sourceOffset);
+          let mergedStyle = blockWithInput
+            .getInlineStyleAt(sourceOffset)
+            .merge(style);
+
+          let entityKey = blockWithInput.getEntityAt(sourceOffset);
 
           return [
             Modifier.replaceText(
@@ -265,39 +335,29 @@ export function createAutoConversionFeature({
               entityKey,
             ),
             sourceOffset + source.length,
-            offset + unescaped.length,
+            outputOffset + unescaped.length,
           ];
         },
-        [content, offsetBeforeMarkdown, offsetBeforeMarkdown],
+        [content, sourceStartOffset, sourceStartOffset],
       );
 
       finalSelectionAfter = content.getSelectionAfter();
 
-      let textRange = SelectionState.createEmpty(blockKey).merge({
-        anchorOffset: offsetBeforeMarkdown,
-        focusOffset: offsetBeforeMarkdown + text.length,
+      let entityRange = SelectionState.createEmpty(blockKey).merge({
+        anchorOffset: sourceStartOffset,
+        focusOffset: sourceStartOffset + text.length,
       }) as SelectionState;
 
       if (entityKey) {
-        content = Modifier.applyEntity(content, textRange, entityKey);
+        content = Modifier.applyEntity(content, entityRange, entityKey);
       }
     }
 
-    if (!finalSelection) {
-      finalSelection = finalSelectionAfter.merge({
-        anchorOffset: finalSelectionAfter.getAnchorOffset() + input.length,
-        focusOffset: finalSelectionAfter.getFocusOffset() + input.length,
-        hasFocus: true,
-      }) as SelectionState;
-    }
-
     content = content.merge({
-      selectionAfter: finalSelection,
+      selectionAfter: finalSelectionAfter.merge({hasFocus: true}),
     }) as ContentState;
 
     editorState = EditorState.push(editorState, content, 'change-inline-style');
-
-    // editorState = EditorState.acceptSelection(editorState, finalSelection);
 
     return editorState;
   };

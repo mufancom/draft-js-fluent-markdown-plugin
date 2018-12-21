@@ -10,7 +10,7 @@ import {
 
 import {createAutoConversionFeature} from './@auto-conversion-feature';
 
-const STRIKETHROUGH_REGEX = /(?:^|[^~])(~{2})((?:\\.|(?!\\|~{2}).)+)(~{2})$/;
+const STRIKETHROUGH_REGEX = /(?:^|[^~])(~{2})((?:\\.|(?!\\|~{2}).)+)(~{1,2})$/;
 
 const STRIKETHROUGH_STYLE: DraftInlineStyle = Immutable.OrderedSet([
   'STRIKETHROUGH',
@@ -19,8 +19,8 @@ const STRIKETHROUGH_STYLE: DraftInlineStyle = Immutable.OrderedSet([
 export function createStrikethroughFeature(): Feature {
   return createAutoConversionFeature({
     style: STRIKETHROUGH_STYLE,
-    matcher(textBeforeOffset) {
-      let groups = STRIKETHROUGH_REGEX.exec(textBeforeOffset);
+    matcher(leftText, input) {
+      let groups = STRIKETHROUGH_REGEX.exec(leftText + input);
 
       if (!groups) {
         return undefined;
@@ -31,6 +31,7 @@ export function createStrikethroughFeature(): Feature {
       let {markdownFragments, textFragments} = unescapeMarkdown(markdownSource);
 
       return {
+        type: closing.length === 2 ? 'match' : 'pre-match',
         opening,
         closing,
         markdownFragments,
