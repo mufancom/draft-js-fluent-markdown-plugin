@@ -6,6 +6,7 @@
   "description": "Draft.js Fluent Markdown Plugin",
   "repository": "https://github.com/makeflow/draft-js-fluent-markdown-plugin.git",
   "scripts": {
+    "build-pages": "parcel demo/index.html --out-dir gh-pages --public-url /draft-js-fluent-markdown-plugin",
     "update-regexes": "node scripts/update-regexes.js",
     "build:library": "rimraf bld/library && tsc --project src/library",
     "build:regexes": "rimraf bld/regexes && tsc --project src/regexes && yarn update-regexes && git diff --exit-code",
