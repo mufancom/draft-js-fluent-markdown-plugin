@@ -6,10 +6,17 @@
   "description": "Draft.js Fluent Markdown Plugin",
   "repository": "https://github.com/makeflow/draft-js-fluent-markdown-plugin.git",
   "scripts": {
-    "build:library": "rimraf bld/library && tsc -p src/library",
-    "lint:library": "tslint -p src/library",
+    "update-regexes": "node scripts/update-regexes.js",
+    "build:library": "rimraf bld/library && tsc --project src/library",
+    "build:regexes": "rimraf bld/regexes && tsc --project src/regexes && yarn update-regexes && git diff --exit-code",
+    "typecheck:demo": "tsc --project demo",
+    "lint:library": "tslint --project src/library",
+    "lint:regexes": "tslint --project src/regexes",
+    "lint:demo": "tslint --project demo",
     "test:library": "yarn build:library && yarn lint:library",
-    "test": "yarn test:library"
+    "test:regexes": "yarn build:regexes && yarn lint:regexes",
+    "test:demo": "yarn typecheck:demo && yarn lint:demo",
+    "test": "yarn test:regexes && yarn test:library && yarn test:demo"
   },
   "main": "bld/library/index.js",
   "types": "bld/library/index.d.ts",
