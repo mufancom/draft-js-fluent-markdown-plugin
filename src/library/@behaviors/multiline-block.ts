@@ -117,7 +117,7 @@ export function handleMultilineBlockReturn(
   }
 
   function processEmptyBlockDowngrading(): void {
-    if (leftText || rightText) {
+    if (leftText || rightText || leftBlockType === 'unstyled') {
       return;
     }
 
