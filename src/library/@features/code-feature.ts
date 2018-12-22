@@ -16,7 +16,6 @@ const CODE_STYLE: DraftInlineStyle = Immutable.OrderedSet(['CODE']);
 
 export function createCodeFeature(): Feature {
   return createAutoTransformFeature({
-    style: CODE_STYLE,
     matcher(leftText, input) {
       let groups = CODE_REGEX.exec(leftText + input);
 
@@ -33,6 +32,7 @@ export function createCodeFeature(): Feature {
         closing,
         markdownFragments,
         textFragments,
+        style: CODE_STYLE,
       };
     },
     compatibilityTester(opening, content, closing) {

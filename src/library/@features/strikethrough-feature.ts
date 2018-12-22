@@ -18,7 +18,6 @@ const STRIKETHROUGH_STYLE: DraftInlineStyle = Immutable.OrderedSet([
 
 export function createStrikethroughFeature(): Feature {
   return createAutoTransformFeature({
-    style: STRIKETHROUGH_STYLE,
     matcher(leftText, input) {
       let groups = STRIKETHROUGH_REGEX.exec(leftText + input);
 
@@ -36,6 +35,7 @@ export function createStrikethroughFeature(): Feature {
         closing,
         markdownFragments,
         textFragments,
+        style: STRIKETHROUGH_STYLE,
       };
     },
     compatibilityTester(opening, _content, closing) {

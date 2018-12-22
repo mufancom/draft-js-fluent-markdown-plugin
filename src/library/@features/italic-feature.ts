@@ -13,7 +13,6 @@ const ITALIC_STYLE: DraftInlineStyle = Immutable.OrderedSet(['ITALIC']);
 
 export function createItalicFeature(): Feature {
   return createAutoTransformFeature({
-    style: ITALIC_STYLE,
     matcher(leftText, input) {
       let leftTextWithInput = leftText + input;
 
@@ -34,6 +33,7 @@ export function createItalicFeature(): Feature {
         closing,
         markdownFragments,
         textFragments,
+        style: ITALIC_STYLE,
       };
     },
     compatibilityTester(opening, _content, closing) {

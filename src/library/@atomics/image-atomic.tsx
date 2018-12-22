@@ -1,9 +1,9 @@
 import {DraftBlockRendererComponentProps} from 'draft-js';
 import React, {FunctionComponent} from 'react';
 
-import {AtomicBlockData, AtomicDescriptorEntry} from '../@atomic';
+import {AtomicData, AtomicDescriptorEntry} from '../@atomic';
 
-export interface ImageBlockData extends AtomicBlockData {
+export interface ImageData extends AtomicData {
   alt: string;
   src: string;
 }
@@ -20,5 +20,5 @@ export function createImageAtomicComponentEntry(): AtomicDescriptorEntry {
     return <img alt={alt} src={src} />;
   };
 
-  return ['image-block', {component: Image}];
+  return ['image', {component: Image}];
 }

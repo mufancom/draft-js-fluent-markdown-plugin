@@ -9,7 +9,7 @@ import {
 } from 'draft-js';
 import * as Immutable from 'immutable';
 
-import {AtomicBlockData} from '../@atomic';
+import {AtomicData} from '../@atomic';
 import {Feature} from '../@feature';
 import {
   getContentSelectionAmbient,
@@ -28,12 +28,12 @@ export interface AutoTransformFeatureMatchResult {
   closing: string;
   markdownFragments: string[];
   textFragments: string[];
+  style?: DraftInlineStyle;
   entity?: AutoTransformFeatureMatchEntityDescriptor;
-  atomic?: AtomicBlockData;
+  atomic?: AtomicData;
 }
 
 export interface AutoTransformFeatureOptions {
-  style: DraftInlineStyle;
   matcher(
     leftText: string,
     input: string,
@@ -47,7 +47,6 @@ export interface AutoTransformFeatureOptions {
 }
 
 export function createAutoTransformFeature({
-  style,
   matcher,
   compatibilityTester,
 }: AutoTransformFeatureOptions): Feature {
@@ -74,6 +73,7 @@ export function createAutoTransformFeature({
       closing,
       markdownFragments,
       textFragments,
+      style,
       entity: entityDescriptor,
       atomic,
     } = result;
@@ -331,9 +331,11 @@ export function createAutoTransformFeature({
             focusOffset: outputOffset + source.length,
           }) as SelectionState;
 
-          let mergedStyle = blockWithInput
-            .getInlineStyleAt(sourceOffset)
-            .merge(style);
+          let replacementStyle = blockWithInput.getInlineStyleAt(sourceOffset);
+
+          if (style) {
+            replacementStyle = replacementStyle.merge(style);
+          }
 
           let entityKey = blockWithInput.getEntityAt(sourceOffset);
 
@@ -342,7 +344,7 @@ export function createAutoTransformFeature({
               content,
               range,
               unescaped,
-              mergedStyle,
+              replacementStyle,
               entityKey,
             ),
             sourceOffset + source.length,

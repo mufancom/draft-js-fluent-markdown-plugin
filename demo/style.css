@@ -10,6 +10,13 @@ body {
   margin: 10px 0;
 }
 
+.DraftEditor-editorContainer [data-contents='true'] > figure > hr {
+  margin: 20px 0;
+  border: none;
+  height: 2px;
+  background-color: #ddd;
+}
+
 .DraftEditor-editorContainer [data-contents='true'] > pre > pre {
   padding: 10px;
   background-color: #eee;

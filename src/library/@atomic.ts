@@ -1,6 +1,6 @@
 import {ComponentType} from 'react';
 
-export interface AtomicBlockData {
+export interface AtomicData {
   type: string;
 }
 

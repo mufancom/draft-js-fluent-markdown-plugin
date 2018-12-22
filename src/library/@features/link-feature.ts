@@ -16,7 +16,6 @@ const LINK_STYLE: DraftInlineStyle = Immutable.OrderedSet(['LINK']);
 
 export function createLinkFeature(): Feature {
   return createAutoTransformFeature({
-    style: LINK_STYLE,
     matcher(leftText, input) {
       let groups = LINK_REGEX.exec(leftText + input);
 
@@ -37,6 +36,7 @@ export function createLinkFeature(): Feature {
         closing,
         markdownFragments,
         textFragments,
+        style: LINK_STYLE,
         entity: {
           type: 'LINK',
           mutability: 'MUTABLE',

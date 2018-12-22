@@ -17,7 +17,6 @@ const BOLD_STYLE: DraftInlineStyle = Immutable.OrderedSet(['BOLD']);
 
 export function createBoldFeature(): Feature {
   return createAutoTransformFeature({
-    style: BOLD_STYLE,
     matcher(leftText, input) {
       let leftTextWithInput = leftText + input;
 
@@ -39,6 +38,7 @@ export function createBoldFeature(): Feature {
         closing,
         markdownFragments,
         textFragments,
+        style: BOLD_STYLE,
       };
     },
     compatibilityTester(opening, _content, closing) {

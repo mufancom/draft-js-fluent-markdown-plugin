@@ -19,6 +19,7 @@ export interface AutoBlockFeatureOptions {
   matcher(
     leftText: string,
     input: string,
+    rightText: string,
   ): AutoBlockFeatureMatchResult | undefined;
   compatibilityTester(list: CharacterMetadata[]): boolean;
 }
@@ -35,9 +36,10 @@ export function createAutoBlockFeature({
       leftBlock,
       leftBlockKey,
       leftText,
+      rightText,
     } = getContentSelectionAmbient(editorState);
 
-    let result = matcher(leftText, input);
+    let result = matcher(leftText, input, rightText);
 
     if (!result) {
       return undefined;

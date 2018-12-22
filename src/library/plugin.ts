@@ -10,7 +10,10 @@ import {EditorPluginFunctions} from 'draft-js-plugins-editor';
 import {KeyboardEvent} from 'react';
 
 import {AtomicDescriptor, AtomicDescriptorEntry} from './@atomic';
-import {createImageAtomicComponentEntry} from './@atomics';
+import {
+  createHorizontalRuleAtomicComponentEntry,
+  createImageAtomicComponentEntry,
+} from './@atomics';
 import {
   handleBlockSplitting,
   handleInlineStyleOverriding,
@@ -28,6 +31,7 @@ import {
   createCodeBlockFeature,
   createCodeFeature,
   createHeaderFeature,
+  createHorizontalRuleFeature,
   createImageFeature,
   createItalicFeature,
   createLinkFeature,
@@ -66,7 +70,10 @@ export class FluentMarkdownPlugin {
     ];
 
     if (block) {
-      atomicComponentEntries.push(createImageAtomicComponentEntry());
+      atomicComponentEntries.push(
+        createImageAtomicComponentEntry(),
+        createHorizontalRuleAtomicComponentEntry(),
+      );
 
       features.push(
         createImageFeature(),
@@ -74,6 +81,7 @@ export class FluentMarkdownPlugin {
         createListFeature(),
         createBlockquoteFeature(),
         createCodeBlockFeature(),
+        createHorizontalRuleFeature(),
       );
     }
 

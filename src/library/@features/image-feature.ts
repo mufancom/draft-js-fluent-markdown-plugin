@@ -1,7 +1,4 @@
-import {DraftInlineStyle} from 'draft-js';
-import * as Immutable from 'immutable';
-
-import {ImageBlockData} from '../@atomics';
+import {ImageData} from '../@atomics';
 import {Feature} from '../@feature';
 import {
   characterListContainsEntityAlike,
@@ -13,11 +10,8 @@ import {createAutoTransformFeature} from './@auto-transform-feature';
 
 const IMAGE_REGEX = /(!\[)((?:\\.|(?!\]).)*)(\]\(((?:\\.|(?![\\)])\S)+?)\))$/;
 
-const IMAGE_STYLE: DraftInlineStyle = Immutable.OrderedSet();
-
 export function createImageFeature(): Feature {
   return createAutoTransformFeature({
-    style: IMAGE_STYLE,
     matcher(leftText, input) {
       let groups = IMAGE_REGEX.exec(leftText + input);
 
@@ -31,8 +25,8 @@ export function createImageFeature(): Feature {
 
       let {text: src} = unescapeMarkdown(srcMarkdownSource);
 
-      let atomic: ImageBlockData = {
-        type: 'image-block',
+      let atomic: ImageData = {
+        type: 'image',
         alt,
         src,
       };
