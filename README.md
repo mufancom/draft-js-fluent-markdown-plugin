@@ -3,7 +3,7 @@
 
 # Draft.js Fluent Markdown Plugin
 
-Just another Draft.js markdown plugin.
+Just another Draft.js markdown plugin. Online [DEMO](https://makeflow.github.io/draft-js-fluent-markdown-plugin/).
 
 ![fluent-markdown](https://user-images.githubusercontent.com/970430/50377868-5d182000-0660-11e9-9535-4636e6e2908d.gif)
 
