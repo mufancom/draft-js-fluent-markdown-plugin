@@ -6,6 +6,7 @@ import {AtomicData, AtomicDescriptorEntry} from '../@atomic';
 export interface ImageData extends AtomicData {
   alt: string;
   src: string;
+  srcSet: string | undefined;
 }
 
 export function createImageAtomicComponentEntry(): AtomicDescriptorEntry {
@@ -16,8 +17,9 @@ export function createImageAtomicComponentEntry(): AtomicDescriptorEntry {
 
     let alt = data.get('alt');
     let src = data.get('src');
+    let srcSet = data.get('srcSet');
 
-    return <img alt={alt} src={src} />;
+    return <img alt={alt} src={src} srcSet={srcSet} />;
   };
 
   return ['image', {component: Image}];

@@ -39,6 +39,10 @@ export function createAutoBlockFeature({
       rightText,
     } = getContentSelectionAmbient(editorState);
 
+    if (leftBlock.getData().get('disableAutoBlock')) {
+      return undefined;
+    }
+
     let result = matcher(leftText, input, rightText);
 
     if (!result) {

@@ -10,8 +10,8 @@ import {
 
 import {createAutoTransformFeature} from './@auto-transform-feature';
 
-const ASTERISK_BOLD_REGEX = /(\*{2})((?:\\.|(?!\\|\*{2}).)+)(\*{1,2})$/;
-const UNDERLINE_BOLD_REGEX = /(_{2})((?:\\.|(?!\\|_{2}).)+)(_{1,2})$/;
+const ASTERISK_BOLD_REGEX = /* /$asterisk-bold-markdown/ */ /(\*{2})((?:(?!\*{2})(?:\\[!"#$%&'()*+,.\/:;<=>?@^_`{}~\[\]\\\-]|(?!\\).|\\(?![!"#$%&'()*+,.\/:;<=>?@^_`{}~\[\]\\\-])))+)(\*{1,2})$/m;
+const UNDERSCORE_BOLD_REGEX = /* /$underscore-bold-markdown/ */ /(_{2})((?:(?!_{2})(?:\\[!"#$%&'()*+,.\/:;<=>?@^_`{}~\[\]\\\-]|(?!\\).|\\(?![!"#$%&'()*+,.\/:;<=>?@^_`{}~\[\]\\\-])))+)(_{1,2})$/m;
 
 const BOLD_STYLE: DraftInlineStyle = Immutable.OrderedSet(['BOLD']);
 
@@ -22,15 +22,18 @@ export function createBoldFeature(): Feature {
 
       let groups =
         ASTERISK_BOLD_REGEX.exec(leftTextWithInput) ||
-        UNDERLINE_BOLD_REGEX.exec(leftTextWithInput);
+        UNDERSCORE_BOLD_REGEX.exec(leftTextWithInput);
 
       if (!groups) {
         return undefined;
       }
 
-      let [, opening, markdownSource, closing] = groups;
+      /* /$asterisk-bold-markdown/ */
+      let opening = groups[1];
+      let textSource = groups[2];
+      let closing = groups[3];
 
-      let {markdownFragments, textFragments} = unescapeMarkdown(markdownSource);
+      let {markdownFragments, textFragments} = unescapeMarkdown(textSource);
 
       return {
         preMatch: closing.length < 2,

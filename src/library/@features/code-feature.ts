@@ -10,7 +10,7 @@ import {
 
 import {createAutoTransformFeature} from './@auto-transform-feature';
 
-const CODE_REGEX = /(?:^|[^`])(`)((?:\\.|(?![`\\]).)+)(`)$/;
+const CODE_REGEX = /* /$code-markdown/ */ /(`)((?:(?!`)(?:\\[!"#$%&'()*+,.\/:;<=>?@^_`{}~\[\]\\\-]|(?!\\).|\\(?![!"#$%&'()*+,.\/:;<=>?@^_`{}~\[\]\\\-])))+)(`)$/m;
 
 const CODE_STYLE: DraftInlineStyle = Immutable.OrderedSet(['CODE']);
 
@@ -23,9 +23,12 @@ export function createCodeFeature(): Feature {
         return undefined;
       }
 
-      let [, opening, markdownSource, closing] = groups;
+      /* /$code-markdown/ */
+      let opening = groups[1];
+      let textSource = groups[2];
+      let closing = groups[3];
 
-      let {markdownFragments, textFragments} = unescapeMarkdown(markdownSource);
+      let {markdownFragments, textFragments} = unescapeMarkdown(textSource);
 
       return {
         opening,

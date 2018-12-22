@@ -1,0 +1,7 @@
+{
+  "extends": "@magicspace/configs/tsconfig.json",
+  "compilerOptions": {
+    "rootDir": ".",
+    "outDir": "../../bld/regexes"
+  }
+}

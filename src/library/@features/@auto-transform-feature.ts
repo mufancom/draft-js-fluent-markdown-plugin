@@ -372,6 +372,11 @@ export function createAutoTransformFeature({
 
     editorState = EditorState.push(editorState, content, 'change-inline-style');
 
+    editorState = EditorState.forceSelection(
+      editorState,
+      content.getSelectionAfter(),
+    );
+
     return editorState;
   };
 }

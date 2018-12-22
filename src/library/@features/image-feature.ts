@@ -8,7 +8,7 @@ import {
 
 import {createAutoTransformFeature} from './@auto-transform-feature';
 
-const IMAGE_REGEX = /(!\[)((?:\\.|(?!\]).)*)(\]\(((?:\\.|(?![\\)])\S)+?)\))$/;
+const IMAGE_REGEX = /* /$image-markdown/ */ /(!\[)((?:(?!\])(?:\\[!"#$%&'()*+,.\/:;<=>?@^_`{}~\[\]\\\-]|(?!\\).|\\(?![!"#$%&'()*+,.\/:;<=>?@^_`{}~\[\]\\\-])))*)(\]\((((?:(?![\s)])(?:\\[!"#$%&'()*+,.\/:;<=>?@^_`{}~\[\]\\\-]|(?!\\).|\\(?![!"#$%&'()*+,.\/:;<=>?@^_`{}~\[\]\\\-])))+)(?: +\d+[wx])?(?:\s*,\s*(?:(?![\s)])(?:\\[!"#$%&'()*+,.\/:;<=>?@^_`{}~\[\]\\\-]|(?!\\).|\\(?![!"#$%&'()*+,.\/:;<=>?@^_`{}~\[\]\\\-])))+(?: +\d+[wx])?)*)\))$/m;
 
 export function createImageFeature(): Feature {
   return createAutoTransformFeature({
@@ -19,16 +19,28 @@ export function createImageFeature(): Feature {
         return undefined;
       }
 
-      let [, opening, altMarkdownSource, closing, srcMarkdownSource] = groups;
+      /* /$image-markdown/ */
+      let opening = groups[1];
+      let altSource = groups[2];
+      let closing = groups[3];
+      let srcSetSource = groups[4];
+      let srcSource = groups[5];
 
-      let {markdown, text: alt} = unescapeMarkdown(altMarkdownSource);
+      let {markdown, text: alt} = unescapeMarkdown(altSource);
 
-      let {text: src} = unescapeMarkdown(srcMarkdownSource);
+      let {text: src} = unescapeMarkdown(srcSource);
+
+      let srcSet: string | undefined;
+
+      if (srcSetSource !== srcSource) {
+        ({text: srcSet} = unescapeMarkdown(srcSetSource));
+      }
 
       let atomic: ImageData = {
         type: 'image',
         alt,
         src,
+        srcSet,
       };
 
       return {

@@ -1,4 +1,4 @@
-const ESCAPED_ASCII_PUNCTUATION_REGEX = /\\([!"#$%&'()*+,./:;<=>?@^_`{}~\[\]\\-])|[^]/g;
+const MARKDOWN_SOURCE_CHARACTER_REGEX = /* /$markdown-source-character/ */ /\\[!"#$%&'()*+,.\/:;<=>?@^_`{}~\[\]\\\-]|[^]/g;
 
 export interface UnescapeMarkdownResult {
   markdownFragments: string[];
@@ -14,7 +14,7 @@ export function unescapeMarkdown(source: string): UnescapeMarkdownResult {
   let textFragments: string[] = [];
 
   // tslint:disable-next-line:no-conditional-assignment
-  while ((groups = ESCAPED_ASCII_PUNCTUATION_REGEX.exec(source))) {
+  while ((groups = MARKDOWN_SOURCE_CHARACTER_REGEX.exec(source))) {
     let [markdownCharacter] = groups;
 
     markdownFragments.push(markdownCharacter);

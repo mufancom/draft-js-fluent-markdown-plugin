@@ -1,5 +1,6 @@
 body {
   font-family: sans-serif;
+  color: #333;
 }
 
 .DraftEditor-editorContainer [data-contents='true'] > div {
@@ -23,7 +24,7 @@ body {
 }
 
 .DraftEditor-editorContainer [data-contents='true'] > blockquote {
-  margin: 10px;
+  margin: 10px 0;
   padding: 5px 10px;
   border-left: solid 4px #eee;
 }
@@ -35,7 +36,7 @@ body {
 }
 
 .DraftEditor-editorContainer [data-contents='true'] a {
-  color: #296dff;
+  color: #3366d6;
   text-decoration: none;
 }
 
