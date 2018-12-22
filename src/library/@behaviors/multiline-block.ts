@@ -17,6 +17,7 @@ const MULTILINE_BLOCK_TYPE_TO_DEFAULT_MAP = new Map([
   ['code-block', true],
   ['unordered-list-item', false],
   ['ordered-list-item', false],
+  ['unstyled', false],
 ]);
 
 export function handleMultilineBlockReturn(

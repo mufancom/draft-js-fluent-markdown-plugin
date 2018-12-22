@@ -2,6 +2,14 @@ body {
   font-family: sans-serif;
 }
 
+.DraftEditor-editorContainer [data-contents='true'] > div {
+  margin: 10px 0;
+}
+
+.DraftEditor-editorContainer [data-contents='true'] > figure {
+  margin: 10px 0;
+}
+
 .DraftEditor-editorContainer [data-contents='true'] > pre > pre {
   padding: 10px;
   background-color: #eee;
