@@ -34,7 +34,6 @@ import {
   createListFeature,
   createStrikethroughFeature,
 } from './@features';
-import {getBlockEntityTypeAt} from './@utils';
 
 export interface FluentMarkdownPluginLinkOptions extends LinkDecoratorOptions {}
 
@@ -99,23 +98,15 @@ export class FluentMarkdownPlugin {
     }
   };
 
-  blockRendererFn = (
-    block: ContentBlock,
-    {getEditorState}: EditorPluginFunctions,
-  ): unknown => {
+  blockRendererFn = (block: ContentBlock): unknown => {
     if (block.getType() !== 'atomic') {
       return undefined;
     }
 
-    let contentState = getEditorState().getCurrentContent();
+    let data = block.getData();
+    let type = data.get('type');
 
-    let entityType = getBlockEntityTypeAt(block, 0, contentState);
-
-    if (!entityType) {
-      return undefined;
-    }
-
-    let descriptor = this.atomicDescriptorMap.get(entityType);
+    let descriptor = this.atomicDescriptorMap.get(type);
 
     return descriptor && {...descriptor, editable: false};
   };

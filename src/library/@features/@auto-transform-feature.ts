@@ -7,7 +7,9 @@ import {
   Modifier,
   SelectionState,
 } from 'draft-js';
+import * as Immutable from 'immutable';
 
+import {AtomicBlockData} from '../@atomic';
 import {Feature} from '../@feature';
 import {
   getContentSelectionAmbient,
@@ -27,7 +29,7 @@ export interface AutoTransformFeatureMatchResult {
   markdownFragments: string[];
   textFragments: string[];
   entity?: AutoTransformFeatureMatchEntityDescriptor;
-  atomic?: boolean;
+  atomic?: AtomicBlockData;
 }
 
 export interface AutoTransformFeatureOptions {
@@ -225,10 +227,6 @@ export function createAutoTransformFeature({
     }
 
     if (atomic) {
-      if (!entityKey) {
-        throw new Error('Entity descriptor is required for atomic block');
-      }
-
       // 1. replace image markdown with zero-width character.
 
       // current content state:
@@ -314,6 +312,11 @@ export function createAutoTransformFeature({
       }) as SelectionState;
 
       content = Modifier.setBlockType(content, atomicBlockRange, 'atomic');
+      content = Modifier.setBlockData(
+        content,
+        atomicBlockRange,
+        Immutable.Map(atomic),
+      );
     } else {
       let blockWithInput = content.getBlockForKey(leftBlockKey);
 

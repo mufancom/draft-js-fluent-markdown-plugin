@@ -1,7 +1,7 @@
 import {DraftInlineStyle} from 'draft-js';
 import * as Immutable from 'immutable';
 
-import {ImageEntityData} from '../@atomics';
+import {ImageBlockData} from '../@atomics';
 import {Feature} from '../@feature';
 import {
   characterListContainsEntityAlike,
@@ -31,19 +31,18 @@ export function createImageFeature(): Feature {
 
       let {text: src} = unescapeMarkdown(srcMarkdownSource);
 
-      let data: ImageEntityData = {alt, src};
+      let atomic: ImageBlockData = {
+        type: 'image-block',
+        alt,
+        src,
+      };
 
       return {
         opening,
         closing,
         markdownFragments: [markdown],
         textFragments: ['\u200b'],
-        entity: {
-          type: 'IMAGE',
-          mutability: 'IMMUTABLE',
-          data,
-        },
-        atomic: true,
+        atomic,
       };
     },
     compatibilityTester(opening, content, closing) {
