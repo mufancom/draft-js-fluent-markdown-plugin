@@ -1,6 +1,10 @@
 {
   "name": "draft-js-fluent-markdown-plugin",
   "version": "0.1.0",
+  "author": "Chengdu Mufan Technology Co., Ltd.",
+  "license": "MIT",
+  "description": "Draft.js Fluent Markdown Plugin",
+  "repository": "https://github.com/makeflow/draft-js-fluent-markdown-plugin.git",
   "scripts": {
     "build:library": "rimraf bld/library && tsc -p src/library",
     "lint:library": "tslint -p src/library",
@@ -8,10 +12,11 @@
     "test": "yarn test:library"
   },
   "main": "bld/library/index.js",
-  "author": "Chengdu Mufan Technology Co., Ltd.",
-  "license": "MIT",
-  "description": "Draft.js Fluent Markdown Plugin",
-  "repository": "https://github.com/makeflow/draft-js-fluent-markdown-plugin.git",
+  "types": "bld/library/index.d.ts",
+  "files": [
+    "src/library/**/*.ts",
+    "bld/library"
+  ],
   "peerDependencies": {
     "draft-js": "^0.10.5",
     "draft-js-plugins-editor": "^2.1.1",
