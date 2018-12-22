@@ -3,7 +3,7 @@ import * as Immutable from 'immutable';
 
 import {Feature} from '../@feature';
 import {
-  characterListContainsEntity,
+  characterListContainsEntityAlike,
   testCharacterListConsistency,
   unescapeMarkdown,
 } from '../@utils';
@@ -45,7 +45,7 @@ export function createBoldFeature(): Feature {
       return (
         testCharacterListConsistency(opening) &&
         testCharacterListConsistency(closing) &&
-        !characterListContainsEntity([...opening, ...closing])
+        !characterListContainsEntityAlike([...opening, ...closing])
       );
     },
   });

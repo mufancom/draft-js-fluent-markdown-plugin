@@ -4,7 +4,7 @@ import * as Immutable from 'immutable';
 import {ImageEntityData} from '../@atomics';
 import {Feature} from '../@feature';
 import {
-  characterListContainsEntity,
+  characterListContainsEntityAlike,
   testCharacterListConsistency,
   unescapeMarkdown,
 } from '../@utils';
@@ -50,7 +50,8 @@ export function createImageFeature(): Feature {
       let list = [...opening, ...content, ...closing];
 
       return (
-        testCharacterListConsistency(list) && !characterListContainsEntity(list)
+        testCharacterListConsistency(list) &&
+        !characterListContainsEntityAlike(list)
       );
     },
   });

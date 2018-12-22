@@ -1,6 +1,6 @@
 import {Feature} from '../@feature';
 import {
-  characterListContainsEntity,
+  characterListContainsEntityAlike,
   testCharacterListConsistency,
 } from '../@utils';
 
@@ -25,7 +25,8 @@ export function createListFeature(): Feature {
     },
     compatibilityTester(list) {
       return (
-        testCharacterListConsistency(list) && !characterListContainsEntity(list)
+        testCharacterListConsistency(list) &&
+        !characterListContainsEntityAlike(list)
       );
     },
   });

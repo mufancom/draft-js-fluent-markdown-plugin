@@ -2,7 +2,7 @@ import {DraftInlineStyle} from 'draft-js';
 import * as Immutable from 'immutable';
 
 import {Feature} from '../@feature';
-import {characterListContainsEntity, unescapeMarkdown} from '../@utils';
+import {characterListContainsEntityAlike, unescapeMarkdown} from '../@utils';
 
 import {createAutoTransformFeature} from './@auto-transform-feature';
 
@@ -37,7 +37,7 @@ export function createItalicFeature(): Feature {
       };
     },
     compatibilityTester(opening, _content, closing) {
-      return !characterListContainsEntity([...opening, ...closing]);
+      return !characterListContainsEntityAlike([...opening, ...closing]);
     },
   });
 }

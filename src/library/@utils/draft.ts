@@ -70,10 +70,12 @@ export function setBlockDepth(
   return content.merge({blockMap}) as ContentState;
 }
 
-export function characterListContainsEntity(
+export function characterListContainsEntityAlike(
   list: CharacterMetadata[],
 ): boolean {
-  return list.some(metadata => !!metadata.getEntity());
+  return list.some(
+    metadata => !!metadata.getEntity() || metadata.hasStyle('CODE'),
+  );
 }
 
 export function testCharacterListConsistency([

@@ -3,7 +3,7 @@ import * as Immutable from 'immutable';
 
 import {Feature} from '../@feature';
 import {
-  characterListContainsEntity,
+  characterListContainsEntityAlike,
   testCharacterListConsistency,
   unescapeMarkdown,
 } from '../@utils';
@@ -33,17 +33,14 @@ export function createCodeFeature(): Feature {
         closing,
         markdownFragments,
         textFragments,
-        entity: {
-          type: 'CODE',
-          mutability: 'MUTABLE',
-        },
       };
     },
     compatibilityTester(opening, content, closing) {
       let list = [...opening, ...content, ...closing];
 
       return (
-        testCharacterListConsistency(list) && !characterListContainsEntity(list)
+        testCharacterListConsistency(list) &&
+        !characterListContainsEntityAlike(list)
       );
     },
   });

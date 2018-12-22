@@ -1,8 +1,6 @@
 import {DraftDecorator, DraftDecoratorComponentProps} from 'draft-js';
 import React, {FunctionComponent} from 'react';
 
-import {getCharacterEntityType} from '../@utils';
-
 export function createCodeDecorator(): DraftDecorator {
   const Code: FunctionComponent<DraftDecoratorComponentProps> = ({
     children,
@@ -10,11 +8,8 @@ export function createCodeDecorator(): DraftDecorator {
 
   return {
     component: Code,
-    strategy(block, callback, contentState) {
-      block.findEntityRanges(
-        metadata => getCharacterEntityType(metadata, contentState) === 'CODE',
-        callback,
-      );
+    strategy(block, callback) {
+      block.findStyleRanges(metadata => metadata.hasStyle('CODE'), callback);
     },
   };
 }
