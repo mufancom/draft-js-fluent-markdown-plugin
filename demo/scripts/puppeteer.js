@@ -47,7 +47,7 @@ const SCRIPT_SEQUENCES = [
   {press: 'Enter', sequenceDelay: 500},
   {type: '---', typeDelay: 100, sequenceDelay: 500},
   {type: '```', typeDelay: 100, sequenceDelay: 500},
-  {type: '# installation'},
+  {type: '# install'},
   {press: 'Enter', sequenceDelay: 500},
   {type: 'yarn add '},
   {paste: 'draft-js-fluent-markdown-plugin'},
