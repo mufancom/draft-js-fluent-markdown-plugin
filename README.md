@@ -16,7 +16,7 @@ Just another Draft.js markdown plugin. Online [DEMO](https://makeflow.github.io/
 ## Install
 
 ```sh
-yarn install draft-js-fluent-markdown-plugin
+yarn add draft-js-fluent-markdown-plugin
 ```
 
 ## Usage
