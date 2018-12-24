@@ -36,14 +36,12 @@ const options: RegexToolsOptions[] = [
     operation: 'combine',
     target: '../../src/library/@features/bold-feature.ts',
     regexes: boldMarkdown(/\*/),
-    flags: 'm',
   },
   {
     name: 'underscore-bold-markdown',
     operation: 'combine',
     target: '../../src/library/@features/bold-feature.ts',
     regexes: boldMarkdown(/_/),
-    flags: 'm',
   },
 ];
 

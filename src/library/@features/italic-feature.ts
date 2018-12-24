@@ -6,8 +6,8 @@ import {characterListContainsEntityAlike, unescapeMarkdown} from '../@utils';
 
 import {createAutoTransformFeature} from './@auto-transform-feature';
 
-const ASTERISK_ITALIC_REGEX = /* /$asterisk-italic-markdown/ */ /(?:^|(?!\*).)(\*)((?:(?!\*)(?:\\[!"#$%&'()*+,.\/:;<=>?@^_`{}~\[\]\\\-]|(?!\\).|\\(?![!"#$%&'()*+,.\/:;<=>?@^_`{}~\[\]\\\-])))+)(\*)$/m;
-const UNDERSCORE_ITALIC_REGEX = /* /$underscore-italic-markdown/ */ /(?:^|(?!_).)(_)((?:(?!_)(?:\\[!"#$%&'()*+,.\/:;<=>?@^_`{}~\[\]\\\-]|(?!\\).|\\(?![!"#$%&'()*+,.\/:;<=>?@^_`{}~\[\]\\\-])))+)(_)$/m;
+const ASTERISK_ITALIC_REGEX = /* /$asterisk-italic-markdown/ */ /(?:^|(?!\*).)(\*)((?:(?!\*)(?:\\[!"#$%&'()*+,.\/:;<=>?@^_`{}~\[\]\\\-]|(?!\\).|\\(?![!"#$%&'()*+,.\/:;<=>?@^_`{}~\[\]\\\-])))+)(\*)$/;
+const UNDERSCORE_ITALIC_REGEX = /* /$underscore-italic-markdown/ */ /(?:^|(?!_).)(_)((?:(?!_)(?:\\[!"#$%&'()*+,.\/:;<=>?@^_`{}~\[\]\\\-]|(?!\\).|\\(?![!"#$%&'()*+,.\/:;<=>?@^_`{}~\[\]\\\-])))+)(_)$/;
 
 const ITALIC_STYLE: DraftInlineStyle = Immutable.OrderedSet(['ITALIC']);
 

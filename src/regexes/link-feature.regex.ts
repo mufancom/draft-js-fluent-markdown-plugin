@@ -31,7 +31,6 @@ const options: RegexToolsOptions = {
   operation: 'combine',
   target: '../../src/library/@features/link-feature.ts',
   regexes: link,
-  flags: 'm',
 };
 
 export default options;

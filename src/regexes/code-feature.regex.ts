@@ -26,7 +26,6 @@ const options: RegexToolsOptions = {
   operation: 'combine',
   target: '../../src/library/@features/code-feature.ts',
   regexes: codeMarkdown,
-  flags: 'm',
 };
 
 export default options;

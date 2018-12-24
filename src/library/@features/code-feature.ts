@@ -10,7 +10,7 @@ import {
 
 import {createAutoTransformFeature} from './@auto-transform-feature';
 
-const CODE_REGEX = /* /$code-markdown/ */ /(`)((?:(?!`)(?:\\[!"#$%&'()*+,.\/:;<=>?@^_`{}~\[\]\\\-]|(?!\\).|\\(?![!"#$%&'()*+,.\/:;<=>?@^_`{}~\[\]\\\-])))+)(`)$/m;
+const CODE_REGEX = /* /$code-markdown/ */ /(`)((?:(?!`)(?:\\[!"#$%&'()*+,.\/:;<=>?@^_`{}~\[\]\\\-]|(?!\\).|\\(?![!"#$%&'()*+,.\/:;<=>?@^_`{}~\[\]\\\-])))+)(`)$/;
 
 const CODE_STYLE: DraftInlineStyle = Immutable.OrderedSet(['CODE']);
 

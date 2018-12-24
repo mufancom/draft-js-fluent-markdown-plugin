@@ -10,8 +10,8 @@ import {
 
 import {createAutoTransformFeature} from './@auto-transform-feature';
 
-const ASTERISK_BOLD_REGEX = /* /$asterisk-bold-markdown/ */ /(\*{2})((?:(?!\*{2})(?:\\[!"#$%&'()*+,.\/:;<=>?@^_`{}~\[\]\\\-]|(?!\\).|\\(?![!"#$%&'()*+,.\/:;<=>?@^_`{}~\[\]\\\-])))+)(\*{1,2})$/m;
-const UNDERSCORE_BOLD_REGEX = /* /$underscore-bold-markdown/ */ /(_{2})((?:(?!_{2})(?:\\[!"#$%&'()*+,.\/:;<=>?@^_`{}~\[\]\\\-]|(?!\\).|\\(?![!"#$%&'()*+,.\/:;<=>?@^_`{}~\[\]\\\-])))+)(_{1,2})$/m;
+const ASTERISK_BOLD_REGEX = /* /$asterisk-bold-markdown/ */ /(\*{2})((?:(?!\*{2})(?:\\[!"#$%&'()*+,.\/:;<=>?@^_`{}~\[\]\\\-]|(?!\\).|\\(?![!"#$%&'()*+,.\/:;<=>?@^_`{}~\[\]\\\-])))+)(\*{1,2})$/;
+const UNDERSCORE_BOLD_REGEX = /* /$underscore-bold-markdown/ */ /(_{2})((?:(?!_{2})(?:\\[!"#$%&'()*+,.\/:;<=>?@^_`{}~\[\]\\\-]|(?!\\).|\\(?![!"#$%&'()*+,.\/:;<=>?@^_`{}~\[\]\\\-])))+)(_{1,2})$/;
 
 const BOLD_STYLE: DraftInlineStyle = Immutable.OrderedSet(['BOLD']);
 

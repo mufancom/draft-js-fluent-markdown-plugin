@@ -29,14 +29,12 @@ const options: RegexToolsOptions[] = [
     operation: 'combine',
     target: '../../src/library/@features/italic-feature.ts',
     regexes: italicMarkdown(/\*/),
-    flags: 'm',
   },
   {
     name: 'underscore-italic-markdown',
     operation: 'combine',
     target: '../../src/library/@features/italic-feature.ts',
     regexes: italicMarkdown(/_/),
-    flags: 'm',
   },
 ];
 

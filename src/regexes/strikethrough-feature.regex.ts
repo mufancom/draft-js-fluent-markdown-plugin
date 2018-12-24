@@ -35,7 +35,6 @@ const options: RegexToolsOptions = {
   operation: 'combine',
   target: '../../src/library/@features/strikethrough-feature.ts',
   regexes: strikethroughMarkdown,
-  flags: 'm',
 };
 
 export default options;

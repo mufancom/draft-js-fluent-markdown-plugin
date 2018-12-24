@@ -10,7 +10,7 @@ import {
 
 import {createAutoTransformFeature} from './@auto-transform-feature';
 
-const STRIKETHROUGH_REGEX = /* /$strikethrough-markdown/ */ /(~{2})((?:(?!~{2})(?:\\[!"#$%&'()*+,.\/:;<=>?@^_`{}~\[\]\\\-]|(?!\\).|\\(?![!"#$%&'()*+,.\/:;<=>?@^_`{}~\[\]\\\-])))+)(~{1,2})$/m;
+const STRIKETHROUGH_REGEX = /* /$strikethrough-markdown/ */ /(~{2})((?:(?!~{2})(?:\\[!"#$%&'()*+,.\/:;<=>?@^_`{}~\[\]\\\-]|(?!\\).|\\(?![!"#$%&'()*+,.\/:;<=>?@^_`{}~\[\]\\\-])))+)(~{1,2})$/;
 
 const STRIKETHROUGH_STYLE: DraftInlineStyle = Immutable.OrderedSet([
   'STRIKETHROUGH',

@@ -56,7 +56,6 @@ const options: RegexToolsOptions = {
   operation: 'combine',
   target: '../../src/library/@features/image-feature.ts',
   regexes: image,
-  flags: 'm',
 };
 
 export default options;
