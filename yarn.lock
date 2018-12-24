@@ -21,6 +21,11 @@
     tslang "^0.1.9"
     tsutils "^2.28.0"
 
+"@types/detect-indent@^5.0.0":
+  version "5.0.0"
+  resolved "http://registry.npm.taobao.org/@types/detect-indent/download/@types/detect-indent-5.0.0.tgz#8b1bbd7891268d5ed20d23ecd23ae333d33934cd"
+  integrity sha1-ixu9eJEmjV7SDSPs0jrjM9M5NM0=
+
 "@types/draft-js@^0.10.26":
   version "0.10.26"
   resolved "http://registry.npm.taobao.org/@types/draft-js/download/@types/draft-js-0.10.26.tgz#0b02324b7981cbab32d23cd0a1d968bbf576757b"
@@ -231,6 +236,11 @@ decorate-component-with-props@^1.0.2:
   version "1.1.0"
   resolved "http://registry.npm.taobao.org/decorate-component-with-props/download/decorate-component-with-props-1.1.0.tgz#b496c814c6a2aba0cf2ad26e44cbedb8ead42f15"
   integrity sha1-tJbIFMaiq6DPKtJuRMvtuOrULxU=
+
+detect-indent@^5.0.0:
+  version "5.0.0"
+  resolved "http://registry.npm.taobao.org/detect-indent/download/detect-indent-5.0.0.tgz#3871cc0a6a002e8c3e5b3cf7f336264675f06b9d"
+  integrity sha1-OHHMCmoALow+Wzz38zYmRnXwa50=
 
 diff@^3.2.0:
   version "3.5.0"

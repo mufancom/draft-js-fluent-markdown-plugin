@@ -31,12 +31,14 @@
     "react": "16"
   },
   "dependencies": {
+    "detect-indent": "^5.0.0",
     "immutable": "~3.7.4",
     "linkify-it": "^2.1.0",
     "tlds": "^1.203.1"
   },
   "devDependencies": {
     "@magicspace/configs": "^0.1.46",
+    "@types/detect-indent": "^5.0.0",
     "@types/draft-js": "^0.10.26",
     "@types/linkify-it": "^2.0.4",
     "@types/react": "^16.7.17",

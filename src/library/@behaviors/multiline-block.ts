@@ -3,18 +3,27 @@ import {KeyboardEvent} from 'react';
 
 import {getContentSelectionAmbient, setBlockDepth} from '../@utils';
 
+const AUTO_INDENT_WHITESPACES_REGEX = /(?:^|\n)([\t ]+).*$/;
+
 const EOL = '\n';
 
+interface MultilineOptions {
+  autoIndent?: boolean;
+}
+
 /**
- * `true`:
+ * `true` | `MultilineOptions`:
  *   - return to enter new line, two continuous EOL leads to block split.
  *   - ctrl to enter new line, ignore continuous EOL splitting.
  * `false`
  *   - ctrl to enter new line.
  */
-const MULTILINE_BLOCK_TYPE_TO_DEFAULT_MAP = new Map([
+const MULTILINE_BLOCK_TYPE_TO_DEFAULT_MAP = new Map<
+  string,
+  boolean | MultilineOptions
+>([
   ['blockquote', true],
-  ['code-block', true],
+  ['code-block', {autoIndent: true}],
   ['unordered-list-item', false],
   ['ordered-list-item', false],
   ['unstyled', false],
@@ -36,25 +45,38 @@ export function handleMultilineBlockReturn(
 
   let leftBlockType = leftBlock.getType();
 
-  let multilineByDefault = MULTILINE_BLOCK_TYPE_TO_DEFAULT_MAP.get(
-    leftBlockType,
-  );
+  let multilineOptions = MULTILINE_BLOCK_TYPE_TO_DEFAULT_MAP.get(leftBlockType);
 
-  if (multilineByDefault !== undefined) {
-    if (event.ctrlKey) {
-      insertEOL();
-    } else if (multilineByDefault) {
-      insertEOL();
-      processContinuousEOL();
-    } else {
-      processEmptyBlockDowngrading();
-    }
+  if (multilineOptions === undefined) {
+    return editorState;
+  }
+
+  let {autoIndent = false} =
+    typeof multilineOptions === 'object' ? multilineOptions : {};
+
+  if (event.shiftKey) {
+    insertEOL();
+  } else if (multilineOptions) {
+    insertEOL();
+    processContinuousEOL();
+  } else {
+    processEmptyBlockDowngrading();
   }
 
   return editorState;
 
   function insertEOL(): void {
-    content = Modifier.replaceText(content, selection, EOL);
+    let textToInsert = EOL;
+
+    if (autoIndent) {
+      let groups = AUTO_INDENT_WHITESPACES_REGEX.exec(leftText);
+
+      if (groups) {
+        textToInsert += groups[1];
+      }
+    }
+
+    content = Modifier.replaceText(content, selection, textToInsert);
 
     editorState = EditorState.push(editorState, content, 'insert-characters');
 

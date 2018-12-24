@@ -15,9 +15,11 @@ import {
   createImageAtomicComponentEntry,
 } from './@atomics';
 import {
+  TabIndentOptions,
   handleBlockSplitting,
   handleInlineStyleOverriding,
   handleMultilineBlockReturn,
+  handleTabIndent,
 } from './@behaviors';
 import {
   LinkDecoratorOptions,
@@ -41,9 +43,12 @@ import {
 
 export interface FluentMarkdownPluginLinkOptions extends LinkDecoratorOptions {}
 
+export interface FluentMarkdownPluginIndentOptions extends TabIndentOptions {}
+
 export interface FluentMarkdownPluginOptions {
-  link?: FluentMarkdownPluginLinkOptions;
   block?: boolean;
+  link?: FluentMarkdownPluginLinkOptions;
+  indent?: FluentMarkdownPluginIndentOptions;
 }
 
 export class FluentMarkdownPlugin {
@@ -53,9 +58,12 @@ export class FluentMarkdownPlugin {
 
   private features: Feature[];
 
+  private indentOptions: FluentMarkdownPluginIndentOptions | undefined;
+
   constructor({
     block = true,
     link: linkOptions = {},
+    indent: indentOptions,
   }: FluentMarkdownPluginOptions) {
     this.decorators = [createCodeDecorator(), createLinkDecorator(linkOptions)];
 
@@ -88,6 +96,8 @@ export class FluentMarkdownPlugin {
     this.atomicDescriptorMap = new Map(atomicComponentEntries);
 
     this.features = features;
+
+    this.indentOptions = indentOptions;
   }
 
   onTab = (
@@ -96,7 +106,15 @@ export class FluentMarkdownPlugin {
   ): DraftHandleValue => {
     let editorState = getEditorState();
 
-    let nextEditorState = RichUtils.onTab(event, editorState, 4);
+    let nextEditorState = handleTabIndent(
+      editorState,
+      event,
+      this.indentOptions,
+    );
+
+    if (nextEditorState === editorState) {
+      nextEditorState = RichUtils.onTab(event, editorState, 4);
+    }
 
     if (nextEditorState !== editorState) {
       setEditorState(nextEditorState);

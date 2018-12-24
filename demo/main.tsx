@@ -7,7 +7,11 @@ import ReactDOM from 'react-dom';
 
 import createFluentMarkdownPlugin from '../bld/library';
 
-const PLUGINS = [createFluentMarkdownPlugin()];
+const PLUGINS = [
+  createFluentMarkdownPlugin({
+    indent: {tabSize: 4},
+  }),
+];
 
 const DEMO_CONTENT = convertFromRaw({
   blocks: [

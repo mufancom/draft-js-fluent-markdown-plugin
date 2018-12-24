@@ -20,6 +20,7 @@ body {
 
 .DraftEditor-editorContainer [data-contents='true'] > pre > pre {
   padding: 10px;
+  tab-size: 4;
   background-color: #eee;
 }
 
