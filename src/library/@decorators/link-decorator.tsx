@@ -1,5 +1,5 @@
 import {DraftDecorator, DraftDecoratorComponentProps} from 'draft-js';
-import React, {FunctionComponent} from 'react';
+import React, {ComponentType, FunctionComponent, createElement} from 'react';
 
 import {getCharacterEntityType, linkify} from '../@utils';
 
@@ -7,13 +7,21 @@ export interface LinkEntityData {
   href: string;
 }
 
-export interface LinkDecoratorOptions {
-  /** Defaults to `'_blank'`. */
-  target?: string;
+export interface LinkComponentProps {
+  href: string;
 }
 
+export interface LinkDecoratorOptions {
+  component?: ComponentType<LinkComponentProps>;
+}
+
+const LinkComponent: FunctionComponent<LinkComponentProps> = ({
+  href,
+  children,
+}) => <a href={href}>{children}</a>;
+
 export function createLinkDecorator({
-  target = '_blank',
+  component = LinkComponent,
 }: LinkDecoratorOptions): DraftDecorator {
   const Link: FunctionComponent<DraftDecoratorComponentProps> = ({
     contentState,
@@ -29,11 +37,7 @@ export function createLinkDecorator({
       ({url: href} = linkify.match(decoratedText)![0]);
     }
 
-    return (
-      <a target={target} href={href}>
-        {children}
-      </a>
-    );
+    return createElement(component, {href}, children);
   };
 
   return {
