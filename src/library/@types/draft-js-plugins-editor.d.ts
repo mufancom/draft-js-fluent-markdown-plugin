@@ -1,15 +1,18 @@
 declare module 'draft-js-plugins-editor' {
-  import {EditorProps, EditorState} from 'draft-js';
-  import {Component, RefObject} from 'react';
+  import {Editor as DraftEditor, EditorProps, EditorState} from 'draft-js';
+  import {Component, ComponentType, RefObject} from 'react';
+  import {Constructor} from 'tslang';
 
-  export interface PluginsEditorProps extends EditorProps {
+  interface PluginsEditorProps extends EditorProps {
     plugins?: any[];
     decorators?: any[];
     defaultKeyBindings?: boolean;
     defaultBlockRenderMap?: boolean;
   }
 
-  export class Editor extends Component<PluginsEditorProps> {}
+  type Editor = DraftEditor & Component<PluginsEditorProps>;
+
+  const Editor: Constructor<Editor>;
 
   export default Editor;
 
