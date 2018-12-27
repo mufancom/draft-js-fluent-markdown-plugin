@@ -52,6 +52,14 @@ export interface FluentMarkdownPluginOptions {
 }
 
 export class FluentMarkdownPlugin {
+  // Using IME may end up unexpected selection change after applying a feature.
+  // E.g.: `*test*|test` could end up with `<i>test</i>te|st`, while the
+  // correct result should be `<i>test</i>|test`. The feature selection lock
+  // hack sets a timer and simply ignored selection changes immediately after a
+  // feature being applied.
+  private featureSelectionLocked = false;
+  private featureSelectionLockTimer: number | undefined;
+
   decorators: DraftDecorator[];
 
   private atomicDescriptorMap: Map<string, AtomicDescriptor>;
@@ -146,6 +154,15 @@ export class FluentMarkdownPlugin {
 
     if (nextEditorState !== editorState) {
       setEditorState(nextEditorState);
+
+      clearTimeout(this.featureSelectionLockTimer);
+
+      this.featureSelectionLocked = true;
+
+      this.featureSelectionLockTimer = setTimeout(
+        () => (this.featureSelectionLocked = false),
+      );
+
       return 'handled';
     } else {
       return 'not-handled';
@@ -189,6 +206,15 @@ export class FluentMarkdownPlugin {
   };
 
   onChange = (editorState: EditorState): EditorState => {
+    if (this.featureSelectionLocked) {
+      let content = editorState.getCurrentContent();
+
+      editorState = EditorState.forceSelection(
+        editorState,
+        content.getSelectionAfter(),
+      );
+    }
+
     return handleInlineStyleOverriding(editorState);
   };
 
