@@ -49,7 +49,7 @@ export function createAutoBlockFeature({
     let {type, data = {}, autoBlockTypeBlacklist} = result;
 
     if (autoBlockTypeBlacklist.has(leftBlock.getType())) {
-      return;
+      return undefined;
     }
 
     let currentInlineStyle = editorState.getCurrentInlineStyle();
