@@ -5,6 +5,7 @@ import {
 } from '../@utils';
 
 import {createAutoBlockFeature} from './@auto-block-feature';
+import {AUTO_BLOCK_TYPE_BLACKLIST} from './@auto-block-type-balcklist';
 
 const HEADER_REGEX = /^(#{1,6}) $/;
 
@@ -32,6 +33,7 @@ export function createHeaderFeature(): Feature {
 
       return {
         type,
+        autoBlockTypeBlacklist: AUTO_BLOCK_TYPE_BLACKLIST,
       };
     },
     compatibilityTester(list) {

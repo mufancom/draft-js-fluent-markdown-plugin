@@ -5,6 +5,7 @@ import {
 } from '../@utils';
 
 import {createAutoBlockFeature} from './@auto-block-feature';
+import {AUTO_BLOCK_TYPE_BLACKLIST} from './@auto-block-type-balcklist';
 
 const LIST_REGEX = /^(?:([-+*])|(\d+\.)) $/;
 
@@ -21,6 +22,7 @@ export function createListFeature(): Feature {
 
       return {
         type: unordered ? 'unordered-list-item' : 'ordered-list-item',
+        autoBlockTypeBlacklist: AUTO_BLOCK_TYPE_BLACKLIST,
       };
     },
     compatibilityTester(list) {

@@ -5,6 +5,7 @@ import {
 } from '../@utils';
 
 import {createAutoBlockFeature} from './@auto-block-feature';
+import {AUTO_BLOCK_TYPE_BLACKLIST} from './@auto-block-type-balcklist';
 
 const CODE_BLOCK_REGEX = /^`{3}$/;
 
@@ -19,9 +20,7 @@ export function createCodeBlockFeature(): Feature {
 
       return {
         type: 'code-block',
-        data: {
-          disableAutoBlock: true,
-        },
+        autoBlockTypeBlacklist: AUTO_BLOCK_TYPE_BLACKLIST,
       };
     },
     compatibilityTester(list) {

@@ -13,6 +13,7 @@ import {getContentSelectionAmbient} from '../@utils';
 export interface AutoBlockFeatureMatchResult {
   type: string;
   data?: object;
+  autoBlockTypeBlacklist: Set<string>;
 }
 
 export interface AutoBlockFeatureOptions {
@@ -39,17 +40,17 @@ export function createAutoBlockFeature({
       rightText,
     } = getContentSelectionAmbient(editorState);
 
-    if (leftBlock.getData().get('disableAutoBlock')) {
-      return undefined;
-    }
-
     let result = matcher(leftText, input, rightText);
 
     if (!result) {
       return undefined;
     }
 
-    let {type, data = {}} = result;
+    let {type, data = {}, autoBlockTypeBlacklist} = result;
+
+    if (autoBlockTypeBlacklist.has(leftBlock.getType())) {
+      return undefined;
+    }
 
     let currentInlineStyle = editorState.getCurrentInlineStyle();
 

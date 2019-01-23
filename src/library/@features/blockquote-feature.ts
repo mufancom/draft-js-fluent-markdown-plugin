@@ -5,6 +5,7 @@ import {
 } from '../@utils';
 
 import {createAutoBlockFeature} from './@auto-block-feature';
+import {AUTO_BLOCK_TYPE_BLACKLIST} from './@auto-block-type-balcklist';
 
 const BLOCKQUOTE_REGEX = /^> $/;
 
@@ -19,6 +20,7 @@ export function createBlockquoteFeature(): Feature {
 
       return {
         type: 'blockquote',
+        autoBlockTypeBlacklist: AUTO_BLOCK_TYPE_BLACKLIST,
       };
     },
     compatibilityTester(list) {
