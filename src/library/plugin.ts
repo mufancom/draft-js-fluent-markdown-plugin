@@ -17,6 +17,7 @@ import {
 import {
   TabIndentOptions,
   handleBlockSplitting,
+  handleCodePasting,
   handleInlineStyleOverriding,
   handleMultilineBlockReturn,
   handleTabIndent,
@@ -196,6 +197,22 @@ export class FluentMarkdownPlugin {
         nextEditorState = handleBlockSplitting(editorState);
         break;
     }
+
+    if (nextEditorState && nextEditorState !== editorState) {
+      setEditorState(nextEditorState);
+      return 'handled';
+    } else {
+      return 'not-handled';
+    }
+  };
+
+  handlePastedText = (
+    text: string,
+    _html: string,
+    editorState: EditorState,
+    {setEditorState}: EditorPluginFunctions,
+  ): DraftHandleValue => {
+    let nextEditorState = handleCodePasting(editorState, text);
 
     if (nextEditorState && nextEditorState !== editorState) {
       setEditorState(nextEditorState);
