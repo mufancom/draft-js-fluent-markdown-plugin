@@ -19,9 +19,7 @@ export function createCodeBlockFeature(): Feature {
 
       return {
         type: 'code-block',
-        data: {
-          disableAutoBlock: true,
-        },
+        blacklist: true,
       };
     },
     compatibilityTester(list) {

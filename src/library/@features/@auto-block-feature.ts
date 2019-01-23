@@ -13,6 +13,7 @@ import {getContentSelectionAmbient} from '../@utils';
 export interface AutoBlockFeatureMatchResult {
   type: string;
   data?: object;
+  blacklist?: boolean;
 }
 
 export interface AutoBlockFeatureOptions {
@@ -23,6 +24,8 @@ export interface AutoBlockFeatureOptions {
   ): AutoBlockFeatureMatchResult | undefined;
   compatibilityTester(list: CharacterMetadata[]): boolean;
 }
+
+const blacklistSet = new Set();
 
 export function createAutoBlockFeature({
   matcher,
@@ -39,7 +42,7 @@ export function createAutoBlockFeature({
       rightText,
     } = getContentSelectionAmbient(editorState);
 
-    if (leftBlock.getData().get('disableAutoBlock')) {
+    if (blacklistSet.has(leftBlock.getType())) {
       return undefined;
     }
 
@@ -49,7 +52,11 @@ export function createAutoBlockFeature({
       return undefined;
     }
 
-    let {type, data = {}} = result;
+    let {type, data = {}, blacklist = false} = result;
+
+    if (blacklist) {
+      blacklistSet.add(type);
+    }
 
     let currentInlineStyle = editorState.getCurrentInlineStyle();
 
