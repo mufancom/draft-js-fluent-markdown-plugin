@@ -6,6 +6,7 @@ import {
   EditorState,
   RichUtils,
 } from 'draft-js';
+import Draft from 'draft-js';
 import {EditorPluginFunctions} from 'draft-js-plugins-editor';
 import {KeyboardEvent} from 'react';
 
@@ -22,6 +23,7 @@ import {
   handleMultilineBlockReturn,
   handleTabIndent,
 } from './@behaviors';
+import CustomBlockMap, {customBlockProvider} from './@custom-block';
 import {
   LinkDecoratorOptions,
   createCodeDecorator,
@@ -31,6 +33,7 @@ import {Feature} from './@feature';
 import {
   createBlockquoteFeature,
   createBoldFeature,
+  createCheckboxListFeature,
   createCodeBlockFeature,
   createCodeFeature,
   createHeaderFeature,
@@ -99,6 +102,7 @@ export class FluentMarkdownPlugin {
         createBlockquoteFeature(),
         createCodeBlockFeature(),
         createHorizontalRuleFeature(),
+        createCheckboxListFeature(),
       );
     }
 
@@ -108,6 +112,8 @@ export class FluentMarkdownPlugin {
 
     this.indentOptions = indentOptions;
   }
+
+  blockRenderMap = Draft.DefaultDraftBlockRenderMap.merge(CustomBlockMap);
 
   onTab = (
     event: KeyboardEvent,
@@ -133,7 +139,16 @@ export class FluentMarkdownPlugin {
     }
   };
 
-  blockRendererFn = (block: ContentBlock): unknown => {
+  blockRendererFn = (
+    block: ContentBlock,
+    editorPluginFunctions: EditorPluginFunctions,
+  ): unknown => {
+    let customBlock = customBlockProvider(block, editorPluginFunctions);
+
+    if (customBlock) {
+      return customBlock;
+    }
+
     if (block.getType() !== 'atomic') {
       return undefined;
     }
