@@ -66,6 +66,8 @@ export class FluentMarkdownPlugin {
 
   decorators: DraftDecorator[];
 
+  blockRenderMap = DefaultDraftBlockRenderMap.merge(CustomBlockMap);
+
   private atomicDescriptorMap: Map<string, AtomicDescriptor>;
 
   private features: Feature[];
@@ -112,8 +114,6 @@ export class FluentMarkdownPlugin {
 
     this.indentOptions = indentOptions;
   }
-
-  blockRenderMap = DefaultDraftBlockRenderMap.merge(CustomBlockMap);
 
   onTab = (
     event: KeyboardEvent,
