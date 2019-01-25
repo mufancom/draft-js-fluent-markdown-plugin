@@ -1,6 +1,6 @@
 import {ContentBlock, ContentState, EditorBlock, EditorState} from 'draft-js';
 import {EditorPluginFunctions} from 'draft-js-plugins-editor';
-import React, {Component} from 'react';
+import React, {Component, ReactNode} from 'react';
 
 const CHECKBOX_LIST_ITEM = 'checkbox-list-item';
 const TRANSLATE_SIZE = '1.5em';
@@ -17,7 +17,7 @@ interface CheckboxListItemBlockProps {
 }
 
 class CheckboxListItem extends Component<CheckboxListItemProps> {
-  render() {
+  render(): ReactNode {
     let {
       offsetKey,
       blockProps: {checked, onChangeChecked},
@@ -51,7 +51,7 @@ export const CheckboxListItemProvider = {
   provider: (
     block: ContentBlock,
     {getEditorState, setEditorState}: EditorPluginFunctions,
-  ) => {
+  ): unknown => {
     let editorState = getEditorState();
 
     let data = block.getData();

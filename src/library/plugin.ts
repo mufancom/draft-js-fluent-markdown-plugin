@@ -1,12 +1,12 @@
 import {
   ContentBlock,
+  DefaultDraftBlockRenderMap,
   DraftDecorator,
   DraftEditorCommand,
   DraftHandleValue,
   EditorState,
   RichUtils,
 } from 'draft-js';
-import Draft from 'draft-js';
 import {EditorPluginFunctions} from 'draft-js-plugins-editor';
 import {KeyboardEvent} from 'react';
 
@@ -113,7 +113,7 @@ export class FluentMarkdownPlugin {
     this.indentOptions = indentOptions;
   }
 
-  blockRenderMap = Draft.DefaultDraftBlockRenderMap.merge(CustomBlockMap);
+  blockRenderMap = DefaultDraftBlockRenderMap.merge(CustomBlockMap);
 
   onTab = (
     event: KeyboardEvent,
