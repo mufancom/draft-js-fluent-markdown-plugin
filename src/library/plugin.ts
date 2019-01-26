@@ -1,6 +1,7 @@
 import {
   ContentBlock,
   DefaultDraftBlockRenderMap,
+  DraftBlockRenderMap,
   DraftDecorator,
   DraftEditorCommand,
   DraftHandleValue,
@@ -8,6 +9,7 @@ import {
   RichUtils,
 } from 'draft-js';
 import {EditorPluginFunctions} from 'draft-js-plugins-editor';
+import * as Immutable from 'immutable';
 import {KeyboardEvent} from 'react';
 
 import {AtomicDescriptor, AtomicDescriptorEntry} from './@atomic';
@@ -23,7 +25,11 @@ import {
   handleMultilineBlockReturn,
   handleTabIndent,
 } from './@behaviors';
-import CustomBlockMap, {customBlockProvider} from './@custom-block';
+import {BlockDescriptorBuilder, BlockDescriptorBuilderEntry} from './@block';
+import {
+  checkableListItemRenderEntry,
+  createCheckableListItemEntry,
+} from './@blocks';
 import {
   LinkDecoratorOptions,
   createCodeDecorator,
@@ -33,7 +39,7 @@ import {Feature} from './@feature';
 import {
   createBlockquoteFeature,
   createBoldFeature,
-  createCheckboxListFeature,
+  createCheckableListItemFeature,
   createCodeBlockFeature,
   createCodeFeature,
   createHeaderFeature,
@@ -56,6 +62,10 @@ export interface FluentMarkdownPluginOptions {
 }
 
 export class FluentMarkdownPlugin {
+  blockRenderMap: DraftBlockRenderMap;
+
+  decorators: DraftDecorator[];
+
   // Using IME may end up unexpected selection change after applying a feature.
   // E.g.: `*test*|test` could end up with `<i>test</i>te|st`, while the
   // correct result should be `<i>test</i>|test`. The feature selection lock
@@ -64,11 +74,8 @@ export class FluentMarkdownPlugin {
   private featureSelectionLocked = false;
   private featureSelectionLockTimer: number | undefined;
 
-  decorators: DraftDecorator[];
-
-  blockRenderMap = DefaultDraftBlockRenderMap.merge(CustomBlockMap);
-
   private atomicDescriptorMap: Map<string, AtomicDescriptor>;
+  private blockDescriptorBuilderMap: Map<string, BlockDescriptorBuilder>;
 
   private features: Feature[];
 
@@ -82,6 +89,9 @@ export class FluentMarkdownPlugin {
     this.decorators = [createCodeDecorator(), createLinkDecorator(linkOptions)];
 
     let atomicComponentEntries: AtomicDescriptorEntry[] = [];
+    let blockBuilderEntries: BlockDescriptorBuilderEntry[] = [];
+
+    let blockRenderMap: DraftBlockRenderMap;
 
     let features: Feature[] = [
       createBoldFeature(),
@@ -97,6 +107,12 @@ export class FluentMarkdownPlugin {
         createHorizontalRuleAtomicComponentEntry(),
       );
 
+      blockBuilderEntries.push(createCheckableListItemEntry());
+
+      blockRenderMap = DefaultDraftBlockRenderMap.merge(
+        Immutable.Map([checkableListItemRenderEntry]),
+      );
+
       features.push(
         createImageFeature(),
         createHeaderFeature(),
@@ -104,11 +120,16 @@ export class FluentMarkdownPlugin {
         createBlockquoteFeature(),
         createCodeBlockFeature(),
         createHorizontalRuleFeature(),
-        createCheckboxListFeature(),
+        createCheckableListItemFeature(),
       );
+    } else {
+      blockRenderMap = DefaultDraftBlockRenderMap;
     }
 
     this.atomicDescriptorMap = new Map(atomicComponentEntries);
+    this.blockDescriptorBuilderMap = new Map(blockBuilderEntries);
+
+    this.blockRenderMap = blockRenderMap;
 
     this.features = features;
 
@@ -141,24 +162,29 @@ export class FluentMarkdownPlugin {
 
   blockRendererFn = (
     block: ContentBlock,
-    editorPluginFunctions: EditorPluginFunctions,
+    pluginFunctions: EditorPluginFunctions,
   ): unknown => {
-    let customBlock = customBlockProvider(block, editorPluginFunctions);
+    let descriptor: unknown;
 
-    if (customBlock) {
-      return customBlock;
+    let blockType = block.getType();
+
+    if (blockType === 'atomic') {
+      let data = block.getData();
+      let type = data.get('type');
+
+      descriptor = {
+        ...this.atomicDescriptorMap.get(type),
+        editable: false,
+      };
+    } else {
+      let builder = this.blockDescriptorBuilderMap.get(blockType);
+
+      if (builder) {
+        descriptor = builder(pluginFunctions);
+      }
     }
 
-    if (block.getType() !== 'atomic') {
-      return undefined;
-    }
-
-    let data = block.getData();
-    let type = data.get('type');
-
-    let descriptor = this.atomicDescriptorMap.get(type);
-
-    return descriptor && {...descriptor, editable: false};
+    return descriptor;
   };
 
   handleBeforeInput = (

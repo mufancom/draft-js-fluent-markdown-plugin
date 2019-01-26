@@ -7,21 +7,26 @@ import {
 import {createAutoBlockFeature} from './@auto-block-feature';
 import {AUTO_BLOCK_TYPE_BLACKLIST} from './@auto-block-type-blacklist';
 
-const LIST_REGEX = /^(?:([-+*])|(\d+\.)) $/;
+const ITEM_REGEX = /^\[([x ])\] $/i;
 
-export function createListFeature(): Feature {
+export function createCheckableListItemFeature(): Feature {
   return createAutoBlockFeature({
-    matcher(input, {leftText}) {
-      let groups = LIST_REGEX.exec(leftText + input);
+    matcher(input, {leftText, leftBlock}) {
+      if (leftBlock.getType() !== 'unordered-list-item') {
+        return undefined;
+      }
+
+      let groups = ITEM_REGEX.exec(leftText + input);
 
       if (!groups) {
         return undefined;
       }
 
-      let [, unordered] = groups;
+      let checked = groups[1] !== ' ';
 
       return {
-        type: unordered ? 'unordered-list-item' : 'ordered-list-item',
+        type: 'checkable-list-item',
+        data: {checked},
         autoBlockTypeBlacklist: AUTO_BLOCK_TYPE_BLACKLIST,
       };
     },

@@ -5,7 +5,7 @@ import {
 } from '../@utils';
 
 import {createAutoBlockFeature} from './@auto-block-feature';
-import {AUTO_BLOCK_TYPE_BLACKLIST} from './@auto-block-type-balcklist';
+import {AUTO_BLOCK_TYPE_BLACKLIST} from './@auto-block-type-blacklist';
 
 const HEADER_REGEX = /^(#{1,6}) $/;
 
@@ -20,7 +20,7 @@ const HEADER_TYPES = [
 
 export function createHeaderFeature(): Feature {
   return createAutoBlockFeature({
-    matcher(leftText, input) {
+    matcher(input, {leftText}) {
       let groups = HEADER_REGEX.exec(leftText + input);
 
       if (!groups) {

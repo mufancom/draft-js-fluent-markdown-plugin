@@ -5,13 +5,13 @@ import {
 } from '../@utils';
 
 import {createAutoBlockFeature} from './@auto-block-feature';
-import {AUTO_BLOCK_TYPE_BLACKLIST} from './@auto-block-type-balcklist';
+import {AUTO_BLOCK_TYPE_BLACKLIST} from './@auto-block-type-blacklist';
 
 const CODE_BLOCK_REGEX = /^`{3}$/;
 
 export function createCodeBlockFeature(): Feature {
   return createAutoBlockFeature({
-    matcher(leftText, input) {
+    matcher(input, {leftText}) {
       let groups = CODE_BLOCK_REGEX.exec(leftText + input);
 
       if (!groups) {

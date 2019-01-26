@@ -8,7 +8,7 @@ import {
 import * as Immutable from 'immutable';
 
 import {Feature} from '../@feature';
-import {getContentSelectionAmbient} from '../@utils';
+import {ContentSelectionAmbient, getContentSelectionAmbient} from '../@utils';
 
 export interface AutoBlockFeatureMatchResult {
   type: string;
@@ -18,9 +18,8 @@ export interface AutoBlockFeatureMatchResult {
 
 export interface AutoBlockFeatureOptions {
   matcher(
-    leftText: string,
     input: string,
-    rightText: string,
+    selectionAmbient: ContentSelectionAmbient,
   ): AutoBlockFeatureMatchResult | undefined;
   compatibilityTester(list: CharacterMetadata[]): boolean;
 }
@@ -30,21 +29,21 @@ export function createAutoBlockFeature({
   compatibilityTester,
 }: AutoBlockFeatureOptions): Feature {
   return (input, editorState) => {
+    let selectionAmbient = getContentSelectionAmbient(editorState);
+
+    let result = matcher(input, selectionAmbient);
+
+    if (!result) {
+      return undefined;
+    }
+
     let {
       content,
       selection,
       leftOffset,
       leftBlock,
       leftBlockKey,
-      leftText,
-      rightText,
-    } = getContentSelectionAmbient(editorState);
-
-    let result = matcher(leftText, input, rightText);
-
-    if (!result) {
-      return undefined;
-    }
+    } = selectionAmbient;
 
     let {type, data = {}, autoBlockTypeBlacklist} = result;
 
