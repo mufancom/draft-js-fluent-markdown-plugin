@@ -38,6 +38,7 @@ body {
 .DraftEditor-editorContainer [data-contents='true'] .checkable-list-item {
   position: relative;
   transform: translateX(-1.5em);
+  z-index: 0;
 }
 
 .DraftEditor-editorContainer
