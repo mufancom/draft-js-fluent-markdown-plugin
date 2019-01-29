@@ -26,6 +26,7 @@ const MULTILINE_BLOCK_TYPE_TO_DEFAULT_MAP = new Map<
   ['code-block', {autoIndent: true}],
   ['unordered-list-item', false],
   ['ordered-list-item', false],
+  ['checkable-list-item', false],
   ['unstyled', false],
 ]);
 
