@@ -9,3 +9,4 @@ export * from './list-feature';
 export * from './blockquote-feature';
 export * from './code-block-feature';
 export * from './horizontal-rule-feature';
+export * from './checkbox-list-item-feature';

@@ -35,6 +35,25 @@ body {
   border-left: solid 4px #eee;
 }
 
+.DraftEditor-editorContainer [data-contents='true'] .checkable-list-item {
+  position: relative;
+  transform: translateX(-1.5em);
+  z-index: 0;
+}
+
+.DraftEditor-editorContainer
+  [data-contents='true']
+  .checkable-list-item-checkbox {
+  position: absolute;
+  z-index: 1;
+}
+
+.DraftEditor-editorContainer
+  [data-contents='true']
+  .checkable-list-item-content {
+  padding-left: 1.5em;
+}
+
 .DraftEditor-editorContainer [data-contents='true'] code {
   padding: 0 4px;
   border-radius: 4px;
