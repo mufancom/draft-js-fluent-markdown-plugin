@@ -7,7 +7,7 @@ import {
   SelectionState,
 } from 'draft-js';
 import {EditorPluginFunctions} from 'draft-js-plugins-editor';
-import React, {Component, ReactNode} from 'react';
+import React, {Component, MouseEvent, ReactNode} from 'react';
 
 import {BlockDescriptorBuilderEntry} from '../@block';
 
@@ -40,6 +40,7 @@ class CheckableListItem extends Component<CheckableListItemProps> {
             checked={checked}
             disabled={readOnly}
             onChange={this.onInputChange}
+            onMouseDown={this.onMouseDown}
           />
         </div>
         <div className="checkable-list-item-content">
@@ -56,6 +57,10 @@ class CheckableListItem extends Component<CheckableListItemProps> {
     } = this.props;
 
     onToggle(block);
+  };
+
+  private onMouseDown = (event: MouseEvent<HTMLDivElement>): void => {
+    event.preventDefault();
   };
 }
 
