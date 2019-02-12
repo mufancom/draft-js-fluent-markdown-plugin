@@ -68,7 +68,7 @@ export const checkableListItemRenderEntry = [
   'checkable-list-item',
   {
     element: 'li',
-    wrapper: <ul className="public-DraftStyleDefault-ul" />,
+    wrapper: <ul className="public-DraftStyleDefault-ul checkable-list" />,
   },
 ];
 
