@@ -35,6 +35,10 @@ body {
   border-left: solid 4px #eee;
 }
 
+.DraftEditor-editorContainer [data-contents='true'] > .checkable-list {
+  list-style: none;
+}
+
 .DraftEditor-editorContainer [data-contents='true'] .checkable-list-item {
   position: relative;
   transform: translateX(-1.5em);
@@ -67,10 +71,6 @@ body {
 
 .DraftEditor-editorContainer [data-contents='true'] a:hover {
   text-decoration: underline;
-}
-
-.checkable-list {
-  list-style: none;
 }
 
 /* GitHub corner */
