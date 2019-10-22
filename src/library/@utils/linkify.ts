@@ -1,4 +1,4 @@
-import linkifyIt, {Rule} from 'linkify-it';
+import linkifyIt, {LinkifyIt, Rule} from 'linkify-it';
 import tlds from 'tlds';
 
 export interface CustomLinkifyRule {
@@ -6,7 +6,7 @@ export interface CustomLinkifyRule {
   definition: Rule;
 }
 
-export const linkify = (rules?: CustomLinkifyRule[]) => {
+export const linkify = (rules?: CustomLinkifyRule[]): LinkifyIt => {
   let linkify = linkifyIt().tlds(tlds);
 
   if (rules) {
