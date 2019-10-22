@@ -21,11 +21,11 @@ const Link: FC<FluentMarkdownPluginLinkComponentProps> = props => {
           return;
         }
 
-        let w = '480',
-          h = '240',
-          size,
-          time,
-          queryString = href.split('?')[1];
+        let w = '480';
+        let h = '240';
+        let size: string | undefined;
+        let time: string | undefined;
+        let queryString = href.split('?')[1];
 
         if (queryString) {
           [size, time] = getQuery(queryString, 'mf').split('t');
@@ -187,9 +187,7 @@ class App extends Component<AppProps, AppState> {
 ReactDOM.render(<App />, document.getElementById('app'));
 
 function getQuery(queryString: string, name: string): string {
-  let result = queryString.match(
-    new RegExp('(^|&)' + name + '=([^&]*)(&|$)', 'i'),
-  );
+  let result = queryString.match(new RegExp(`(^|&)${name}=([^&]*)(&|$)`, 'i'));
 
   return result ? result[2] : '';
 }
