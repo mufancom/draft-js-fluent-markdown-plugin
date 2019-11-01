@@ -10,45 +10,24 @@ import createFluentMarkdownPlugin, {
 } from '../bld/library';
 
 const Link: FC<FluentMarkdownPluginLinkComponentProps> = props => {
+  let href = props.href;
+
   return (
     <a
-      href="#"
-      onClick={() => {
-        let href = props.href;
-
-        if (!href.startsWith('mf+')) {
-          window.open(href);
+      href={href}
+      title={href}
+      onClick={(event): void => {
+        if (!href.startsWith('open+')) {
           return;
         }
 
-        let w = '480';
-        let h = '240';
-        let size: string | undefined;
-        let time: string | undefined;
-        let queryString = href.split('?')[1];
+        event.preventDefault();
 
-        if (queryString) {
-          [size, time] = getQuery(queryString, 'mf').split('t');
-
-          [w, h] = size.split('x');
-        }
-
-        let newWindow = window.open(
-          href.slice(3),
+        window.open(
+          href.slice(5),
           '_blank',
-          `width=${w},height=${h} ,left=${(window.screen.availWidth -
-            Number(w)) /
-            2},top=${(window.screen.availHeight - Number(h)) /
-            2},toolbar=no,menubar=no,scrollbars=no,resizable=no,location=no`,
+          'toolbar=no,menubar=no,scrollbars=no,resizable=no,location=no',
         );
-
-        let autoCloseTime = Number(time);
-
-        if (autoCloseTime) {
-          setTimeout(() => {
-            newWindow!.close();
-          }, autoCloseTime);
-        }
       }}
     >
       {props.children}
@@ -61,13 +40,13 @@ const PLUGINS = [
     indent: {tabSize: 4},
     link: {
       component: Link,
-      customLinkifyRule: [
+      rules: [
         {
-          schema: 'mf+http:',
+          schema: 'open+http:',
           definition: 'http:',
         },
         {
-          schema: 'mf+https:',
+          schema: 'open+https:',
           definition: 'https:',
         },
       ],
@@ -107,51 +86,6 @@ const DEMO_CONTENT = convertFromRaw({
       entityRanges: [],
       data: {},
     },
-    {
-      key: 'neob7',
-      text: '',
-      type: 'unstyled',
-      depth: 0,
-      inlineStyleRanges: [],
-      entityRanges: [],
-    },
-    {
-      key: 'neob8',
-      text: 'Append ")" to next line.  width x height t autoCloseTime(ms)',
-      type: 'unstyled',
-      depth: 0,
-      inlineStyleRanges: [
-        {
-          offset: 0,
-          length: 24,
-          style: 'UNDERLINE',
-        },
-        {
-          offset: 26,
-          length: 5,
-          style: 'CODE',
-        },
-        {
-          offset: 34,
-          length: 6,
-          style: 'CODE',
-        },
-        {
-          offset: 43,
-          length: 17,
-          style: 'CODE',
-        },
-      ],
-      entityRanges: [],
-    },
-    {
-      key: 'neob9',
-      text: '[makeflow](mf+https://makeflow.com?mf=800x600t2000',
-      type: 'unstyled',
-      depth: 0,
-      inlineStyleRanges: [],
-      entityRanges: [],
-    },
   ],
   entityMap: {},
 });
@@ -185,9 +119,3 @@ class App extends Component<AppProps, AppState> {
 }
 
 ReactDOM.render(<App />, document.getElementById('app'));
-
-function getQuery(queryString: string, name: string): string {
-  let result = queryString.match(new RegExp(`(^|&)${name}=([^&]*)(&|$)`, 'i'));
-
-  return result ? result[2] : '';
-}

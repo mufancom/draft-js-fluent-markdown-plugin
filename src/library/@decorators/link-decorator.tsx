@@ -17,7 +17,7 @@ export interface LinkComponentProps {
 
 export interface LinkDecoratorOptions {
   component?: ComponentType<LinkComponentProps>;
-  customLinkifyRule?: CustomLinkifyRule[];
+  rules?: CustomLinkifyRule[];
 }
 
 const LinkComponent: FunctionComponent<LinkComponentProps> = ({
@@ -27,9 +27,9 @@ const LinkComponent: FunctionComponent<LinkComponentProps> = ({
 
 export function createLinkDecorator({
   component = LinkComponent,
-  customLinkifyRule,
+  rules,
 }: LinkDecoratorOptions): DraftDecorator {
-  const linkify = _linkify(customLinkifyRule);
+  const linkify = _linkify(rules);
 
   const Link: FunctionComponent<DraftDecoratorComponentProps> = ({
     contentState,
