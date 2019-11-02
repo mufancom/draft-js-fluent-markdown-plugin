@@ -31,6 +31,7 @@ import {
   createCheckableListItemEntry,
 } from './@blocks';
 import {
+  LinkComponentProps,
   LinkDecoratorOptions,
   createCodeDecorator,
   createLinkDecorator,
@@ -50,6 +51,9 @@ import {
   createListFeature,
   createStrikethroughFeature,
 } from './@features';
+
+export interface FluentMarkdownPluginLinkComponentProps
+  extends LinkComponentProps {}
 
 export interface FluentMarkdownPluginLinkOptions extends LinkDecoratorOptions {}
 

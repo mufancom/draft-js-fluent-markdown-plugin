@@ -1,7 +1,11 @@
 import {DraftDecorator, DraftDecoratorComponentProps} from 'draft-js';
 import React, {ComponentType, FunctionComponent, createElement} from 'react';
 
-import {getCharacterEntityType, linkify} from '../@utils';
+import {
+  CustomLinkifyRule,
+  getCharacterEntityType,
+  linkify as _linkify,
+} from '../@utils';
 
 export interface LinkEntityData {
   href: string;
@@ -13,6 +17,7 @@ export interface LinkComponentProps {
 
 export interface LinkDecoratorOptions {
   component?: ComponentType<LinkComponentProps>;
+  rules?: CustomLinkifyRule[];
 }
 
 const LinkComponent: FunctionComponent<LinkComponentProps> = ({
@@ -22,7 +27,10 @@ const LinkComponent: FunctionComponent<LinkComponentProps> = ({
 
 export function createLinkDecorator({
   component = LinkComponent,
+  rules,
 }: LinkDecoratorOptions): DraftDecorator {
+  const linkify = _linkify(rules);
+
   const Link: FunctionComponent<DraftDecoratorComponentProps> = ({
     contentState,
     decoratedText,
