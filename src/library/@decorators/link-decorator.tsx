@@ -1,5 +1,5 @@
-import {DraftDecorator, DraftDecoratorComponentProps} from 'draft-js';
-import React, {ComponentType, FunctionComponent, createElement} from 'react';
+import { DraftDecorator, DraftDecoratorComponentProps } from 'draft-js';
+import React, { ComponentType, FunctionComponent, createElement } from 'react';
 
 import {
   CustomLinkifyRule,
@@ -11,7 +11,7 @@ export interface LinkEntityData {
   href: string;
 }
 
-export interface LinkComponentProps {
+export interface LinkComponentProps extends DraftDecoratorComponentProps {
   href: string;
 }
 
@@ -40,12 +40,12 @@ export function createLinkDecorator({
     let href: string;
 
     if (entityKey) {
-      ({href} = contentState.getEntity(entityKey).getData() as LinkEntityData);
+      ({ href } = contentState.getEntity(entityKey).getData() as LinkEntityData);
     } else {
-      ({url: href} = linkify.match(decoratedText)![0]);
+      ({ url: href } = linkify.match(decoratedText)![0]);
     }
 
-    return createElement(component, {href}, children);
+    return createElement(component, { contentState, decoratedText, entityKey, href }, children);
   };
 
   return {
