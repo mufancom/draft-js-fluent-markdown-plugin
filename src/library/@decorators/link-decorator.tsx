@@ -11,7 +11,7 @@ export interface LinkEntityData {
   href: string;
 }
 
-export interface LinkComponentProps {
+export interface LinkComponentProps extends DraftDecoratorComponentProps {
   href: string;
 }
 
@@ -45,7 +45,11 @@ export function createLinkDecorator({
       ({url: href} = linkify.match(decoratedText)![0]);
     }
 
-    return createElement(component, {href}, children);
+    return createElement(
+      component,
+      {contentState, decoratedText, entityKey, href},
+      children,
+    );
   };
 
   return {
