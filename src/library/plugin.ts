@@ -194,7 +194,6 @@ export class FluentMarkdownPlugin {
   handleBeforeInput = (
     input: string,
     editorState: EditorState,
-    _eventTimeStamp: number,
     {setEditorState}: EditorPluginFunctions,
   ): DraftHandleValue => {
     let nextEditorState = this.triggerFeature(input, editorState);
@@ -234,7 +233,6 @@ export class FluentMarkdownPlugin {
   handleKeyCommand = (
     command: DraftEditorCommand,
     editorState: EditorState,
-    _eventTimeStamp: number,
     {setEditorState}: EditorPluginFunctions,
   ): DraftHandleValue => {
     let nextEditorState: EditorState | undefined;
