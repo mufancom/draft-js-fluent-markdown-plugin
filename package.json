@@ -24,6 +24,7 @@
   "types": "bld/library/index.d.ts",
   "files": [
     "src/library/**/*.ts",
+    "src/library/**/*.tsx",
     "bld/library"
   ],
   "peerDependencies": {
