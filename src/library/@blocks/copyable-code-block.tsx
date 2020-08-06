@@ -1,6 +1,7 @@
 import {ContentBlock, ContentState, EditorBlock} from 'draft-js';
 import {EditorPluginFunctions} from 'draft-js-plugins-editor';
-import React, {CSSProperties, Component, MouseEvent, ReactNode} from 'react';
+import React, {Component, MouseEvent, ReactNode} from 'react';
+import styled from 'styled-components';
 
 import {BlockDescriptorBuilderEntry} from '../@block';
 import {ON_COPY_FAILED, ON_COPY_SUCCEED} from '../constants';
@@ -18,20 +19,37 @@ interface CopyableCodeBlockBlockProps {
   getCurrentText(blockKey: string): string;
 }
 
-const copyableCodeBlockStyle: CSSProperties = {
-  position: 'relative',
-};
+interface CopyableCodeBlockState {
+  copyButtonText: 'Copy' | 'Copied';
+}
 
-const copyableCodeBlockCopyButtonStyle: CSSProperties = {
-  position: 'absolute',
-  top: '8px',
-  right: '8px',
-  border: 0,
-  outline: 'none',
-  cursor: 'pointer',
-};
+const Wrapper = styled.div`
+  position: relative;
 
-class CopyableCodeBlock extends Component<CopyableCodeBlockProps> {
+  .copyable-code-block-copy-button {
+    position: absolute;
+    top: 0px;
+    right: 0px;
+    border: 0;
+    outline: none;
+    cursor: pointer;
+    background: none transparent;
+
+    &::before {
+      content: attr(data-title);
+      display: block;
+      font-size: 13px;
+      color: #222;
+    }
+  }
+`;
+
+const SHOW_COPIED_TIMEOUT = 3000;
+
+class CopyableCodeBlock extends Component<
+  CopyableCodeBlockProps,
+  CopyableCodeBlockState
+> {
   private get content(): string {
     let {
       block,
@@ -41,33 +59,63 @@ class CopyableCodeBlock extends Component<CopyableCodeBlockProps> {
     return getCurrentText(block.getKey());
   }
 
+  private get copyButtonText(): CopyableCodeBlockState['copyButtonText'] {
+    return this.state.copyButtonText;
+  }
+
+  private set copyButtonText(
+    newValue: CopyableCodeBlockState['copyButtonText'],
+  ) {
+    let currentValue = this.copyButtonText;
+
+    if (currentValue === newValue) {
+      return;
+    }
+
+    if (newValue === 'Copied') {
+      setTimeout(() => {
+        this.copyButtonText = 'Copy';
+      }, SHOW_COPIED_TIMEOUT);
+    }
+
+    this.setState({copyButtonText: newValue});
+  }
+
+  state: CopyableCodeBlockState = {copyButtonText: 'Copy'};
+
   render(): ReactNode {
     let {offsetKey} = this.props;
 
     return (
-      <div
-        className="copyable-code-block"
-        data-offset-key={offsetKey}
-        style={copyableCodeBlockStyle}
-      >
+      <Wrapper className="copyable-code-block" data-offset-key={offsetKey}>
         <EditorBlock {...this.props} />
         <button
           className="copyable-code-block-copy-button"
           onMouseDown={this.onCopyMouseDown}
-          style={copyableCodeBlockCopyButtonStyle}
+          data-title={this.copyButtonText}
         />
-      </div>
+      </Wrapper>
     );
   }
 
   private onCopyMouseDown = (event: MouseEvent<HTMLButtonElement>): void => {
+    if (event.button !== 0) {
+      return;
+    }
+
     event.preventDefault();
+
+    this.copyContent();
+  };
+
+  private copyContent(): void {
+    this.copyButtonText = 'Copied';
 
     navigator.clipboard
       .writeText(this.content)
       .then(() => this.dispatchCopyEvent(ON_COPY_SUCCEED))
       .catch(() => this.dispatchCopyEvent(ON_COPY_FAILED));
-  };
+  }
 
   private dispatchCopyEvent(event: CopyEvent): void {
     document.dispatchEvent(new CustomEvent(event));

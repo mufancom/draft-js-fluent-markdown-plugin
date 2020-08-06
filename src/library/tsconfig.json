@@ -6,6 +6,7 @@
     "lib": ["esnext", "dom", "dom.iterable"],
     "experimentalDecorators": true,
     "jsx": "react",
+    "types": ["node"],
 
     "declaration": true,
     "declarationMap": true,

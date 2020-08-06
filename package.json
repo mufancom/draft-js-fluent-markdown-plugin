@@ -36,6 +36,7 @@
     "detect-indent": "^5.0.0",
     "immutable": "~3.7.4",
     "linkify-it": "^2.1.0",
+    "styled-components": "3",
     "tlds": "^1.203.1"
   },
   "devDependencies": {
@@ -45,6 +46,7 @@
     "@types/linkify-it": "^2.0.4",
     "@types/react": "^16.7.17",
     "@types/react-dom": "^16.0.11",
+    "@types/styled-components": "3",
     "@types/tlds": "^1.199.0",
     "cssnano": "^4.1.8",
     "draft-js": "^0.10.5",
