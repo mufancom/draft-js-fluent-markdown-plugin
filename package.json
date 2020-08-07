@@ -1,6 +1,6 @@
 {
   "name": "draft-js-fluent-markdown-plugin",
-  "version": "0.1.16",
+  "version": "0.1.17",
   "author": "Chengdu Mufan Technology Co., Ltd.",
   "license": "MIT",
   "description": "Draft.js Fluent Markdown Plugin",
@@ -58,6 +58,6 @@
     "rimraf": "^2.6.2",
     "tslint": "^5.11.0",
     "tslint-language-service": "^0.9.9",
-    "typescript": "^3.2.2"
+    "typescript": "^3.9.7"
   }
 }

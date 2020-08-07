@@ -23,10 +23,43 @@ body {
   background-color: #ddd;
 }
 
-.DraftEditor-editorContainer [data-contents='true'] > pre > pre {
+.DraftEditor-editorContainer [data-contents='true'] > pre > pre > .code-block {
+  position: relative;
   padding: 10px;
   tab-size: 4;
   background-color: #eee;
+}
+
+.DraftEditor-editorContainer
+  [data-contents='true']
+  > pre
+  > pre
+  > .code-block
+  .code-block-copy-button {
+  position: absolute;
+  top: 0;
+  right: 0;
+}
+
+.DraftEditor-editorContainer
+  [data-contents='true']
+  > pre
+  > pre
+  > .code-block
+  .code-block-copy-button::before {
+  content: 'Copy';
+  display: block;
+  font-size: 13px;
+  color: #222;
+}
+
+.DraftEditor-editorContainer
+  [data-contents='true']
+  > pre
+  > pre
+  > .code-block.code-block-copied
+  .code-block-copy-button::before {
+  content: 'Copied';
 }
 
 .DraftEditor-editorContainer [data-contents='true'] > blockquote {

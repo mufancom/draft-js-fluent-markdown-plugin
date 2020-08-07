@@ -29,6 +29,7 @@ import {BlockDescriptorBuilder, BlockDescriptorBuilderEntry} from './@block';
 import {
   checkableListItemRenderEntry,
   createCheckableListItemEntry,
+  createCodeBlockEntry,
 } from './@blocks';
 import {
   LinkComponentProps,
@@ -111,7 +112,10 @@ export class FluentMarkdownPlugin {
         createHorizontalRuleAtomicComponentEntry(),
       );
 
-      blockBuilderEntries.push(createCheckableListItemEntry());
+      blockBuilderEntries.push(
+        createCheckableListItemEntry(),
+        createCodeBlockEntry(),
+      );
 
       blockRenderMap = DefaultDraftBlockRenderMap.merge(
         Immutable.Map([checkableListItemRenderEntry]),
