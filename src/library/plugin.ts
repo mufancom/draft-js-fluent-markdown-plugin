@@ -29,7 +29,7 @@ import {BlockDescriptorBuilder, BlockDescriptorBuilderEntry} from './@block';
 import {
   checkableListItemRenderEntry,
   createCheckableListItemEntry,
-  createCopyableCodeBlockEntry,
+  createCodeBlockEntry,
 } from './@blocks';
 import {
   LinkComponentProps,
@@ -114,7 +114,7 @@ export class FluentMarkdownPlugin {
 
       blockBuilderEntries.push(
         createCheckableListItemEntry(),
-        createCopyableCodeBlockEntry(),
+        createCodeBlockEntry(),
       );
 
       blockRenderMap = DefaultDraftBlockRenderMap.merge(

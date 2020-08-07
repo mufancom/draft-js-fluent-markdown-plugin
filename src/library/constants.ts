@@ -1,2 +1,2 @@
-export const ON_COPY_SUCCEED = 'copyable-code-block:on-copy-succeed';
-export const ON_COPY_FAILED = 'copyable-code-block:on-copy-failed';
+export const CODE_BLOCK_COPIED_EVENT_NAME = 'code-block:copied';
+export const CODE_BLOCK_COPY_ERROR_EVENT_NAME = 'code-block:copy-error';
