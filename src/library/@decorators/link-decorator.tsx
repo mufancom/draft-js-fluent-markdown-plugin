@@ -11,7 +11,16 @@ export interface LinkEntityData {
   href: string;
 }
 
-export interface LinkComponentProps extends DraftDecoratorComponentProps {
+export interface DraftDecoratorComponentPropsWithOffsetKey
+  extends DraftDecoratorComponentProps {
+  /**
+   * A internal props of draft-js. may be removed in the future.
+   */
+  offsetKey: string;
+}
+
+export interface LinkComponentProps
+  extends DraftDecoratorComponentPropsWithOffsetKey {
   href: string;
 }
 
@@ -31,10 +40,11 @@ export function createLinkDecorator({
 }: LinkDecoratorOptions): DraftDecorator {
   const linkify = _linkify(rules);
 
-  const Link: FunctionComponent<DraftDecoratorComponentProps> = ({
+  const Link: FunctionComponent<DraftDecoratorComponentPropsWithOffsetKey> = ({
     contentState,
     decoratedText,
     entityKey,
+    offsetKey,
     children,
   }) => {
     let href: string;
@@ -47,7 +57,7 @@ export function createLinkDecorator({
 
     return createElement(
       component,
-      {contentState, decoratedText, entityKey, href},
+      {contentState, decoratedText, entityKey, offsetKey, href},
       children,
     );
   };
