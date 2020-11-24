@@ -18,7 +18,9 @@ export function handleInlineStyleOverriding(
 
   let blockKey = selection.getStartKey();
   let block = content.getBlockForKey(blockKey);
-  let blockLength = block.getLength();
+
+  // The selection might be in a non-existent position during the undo operation?
+  let blockLength = block?.getLength();
 
   // Empty block
 
